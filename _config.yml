@@ -1,9 +1,12 @@
 ---
-title: perfect-fit
+title: Perfect Fit
 timezone: UTC
 collections:
   posts:
     title: Posts
+    output: true
+  strips:
+    title: Strips
     output: true
   uploads:
     title: Uploads
@@ -21,3 +24,6 @@ defaults:
   values:
     layout: page
 permalink: pretty
+tagline: this is a test
+tagline2: to see if this section
+tagline3: works fine
