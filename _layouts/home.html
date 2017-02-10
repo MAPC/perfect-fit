@@ -11,21 +11,40 @@ layout: default
 </section>
 
 <section id="one" class="wrapper style1 special">
-            <div class="inner">
-              <header class="major">
-                {{site.description | markdownify}}
-              </header>
-              <ul class="icons major">
-                <li><span class="icon fa-car major style1"><span class="label">Lorem</span></span></li>
-                <li><span class="icon fa-info-circle major style2"><span class="label">Ipsum</span></span></li>
-                <li><span class="icon fa-users major style3"><span class="label">Dolor</span></span></li>
-              </ul>
-            </div>
-          </section>
+  <div class="inner">
+    <header class="major">
+      {{site.description | markdownify}}
+    </header>
+    <ul class="icons major">
+      <li><span class="icon fa-car major style1"><span class="label">Lorem</span></span></li>
+      <li><span class="icon fa-info-circle major style2"><span class="label">Ipsum</span></span></li>
+      <li><span class="icon fa-users major style3"><span class="label">Dolor</span></span></li>
+    </ul>
+  </div>
+</section>
 
 <section id="two" class="wrapper alt style2">
   {% assign sorted_strips = site.strips | sort: 'position' %}
   {% for strip in sorted_strips %}
     {% include strip.html content=strip.content title=strip.title id=strip.title image=strip.image %} 
   {% endfor %}
+</section>
+
+<section id="three" class="wrapper style3">
+  <div class="inner">
+    <header class="major">
+      {{site.links-body | markdownify}}
+    </header>
+  </div>
+</section>
+
+<section id="cta" class="wrapper style4">
+  <div class="inner">
+    <header>
+      {{site.contact-body | markdownify}}
+    </header>
+    <ul class="actions vertical">
+      <li><a href="mailto: {{site.contact-person-email}}" class="button special">E-mail {{site.contact-person}}</a></li>
+    </ul>
+  </div>
 </section>
