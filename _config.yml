@@ -1,5 +1,5 @@
 ---
-title: Perfect Fit
+title: PERFECT FIT
 timezone: UTC
 collections:
   posts:
@@ -24,6 +24,4 @@ defaults:
   values:
     layout: page
 permalink: pretty
-tagline: this is a test
-tagline2: to see if this section
-tagline3: works fine
+tagline: MAPC’s Perfect Fit Parking Initiative
