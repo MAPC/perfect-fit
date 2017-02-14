@@ -4,4 +4,4 @@ date: 2017-02-09 22:05:00 Z
 image: "/uploads/lost%20opportunity.jpg"
 ---
 
-Overbuilt parking spaces observed in Arlington, Chelsea, Everett, Malden, and Melrose could instead be used to build 427 2-bedroom housing units or 8 acres of parks, playground or open space.
+Instead of overbuilding parking spaces, communities can instead put this land to more productive and beneficial uses, including the development of open space, affordable housing, or other uses that may provide a higher tax base.
