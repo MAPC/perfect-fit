@@ -338,6 +338,10 @@ body {
   }
 
   &__center {
+    @include media('small') {
+      width: 100%;
+    }
+
     width: 28em;
     margin: 0 auto 1rem;
   }
