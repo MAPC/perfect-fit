@@ -68,7 +68,7 @@ body {
 .index-header {
   &__background {
     @include media('small') {
-      background-image: url('https://mapc.github.io/perfect-fit-staging/assets/images/header-mobile.jpg');
+      background-image: url('https://mapc.github.io/perfect-fit-staging/assets/images/header-mobile.png');
     }
 
     background-attachment: fixed;
