@@ -231,6 +231,10 @@ body {
   }
 
   &__left {
+    @include media(small) {
+      margin: 1rem auto;
+    }
+
     border-radius: .8rem;
     box-shadow: 0 3px 20px rgba(13, 14, 242, .16);
     display: flex;
@@ -240,6 +244,10 @@ body {
   }
 
   &__right {
+    @include media(small) {
+      margin: 1rem auto;
+    }
+
     border-radius: .8rem;
     box-shadow: 0 3px 20px rgba(13, 14, 242, .16);
     margin: 4rem 4rem 4rem 1rem;
