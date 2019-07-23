@@ -344,7 +344,7 @@ body {
 
   &__legend {
     @include media('small') {
-      max-width: 100%;
+      max-width: 100vw;
     }
 
     margin-left: -10rem;
