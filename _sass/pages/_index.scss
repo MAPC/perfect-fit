@@ -215,10 +215,15 @@ body {
 }
 
 .explainer {
+  @include media(small) {
+    grid-template-columns: 90%;
+    margin: 1rem auto;
+    width: 90%;
+  }
+
   display: grid;
   grid-template-columns: 60% 40%;
-  margin-top: 5rem;
-  margin-bottom: 5rem;
+  margin: 5rem auto;
 
   &__center {
     margin: 0 auto;
