@@ -322,6 +322,8 @@ window.addEventListener('DOMContentLoaded', () => {
       'WALTHAM',
       'WATERTOWN',
       'WINTHROP'];
+    console.log("DATA: ");
+    console.log(data);
     const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.town));
     const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']);
     createTownMap(filteredMunicipalities);
