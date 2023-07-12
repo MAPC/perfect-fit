@@ -25,10 +25,26 @@
   stroke: blue;
   transition: 'fill-opacity 250ms linear';
   &--selected {
-    fill: blue;
+    fill: $site_selected;
     fill-opacity: 1;
-    stroke: blue;
+    stroke: $site_selected;
     transition: initial;
+  }
+  &.p1{
+    fill: $site_fill_color_p1;
+    stroke: $site_stroke_color_p1;
+  }
+  &.p2{
+    fill: $site_fill_color_p2;
+    stroke: $site_stroke_color_p2;
+  }
+  &.p3{
+    fill: $site_fill_color_p3;
+    stroke: $site_stroke_color_p3;
+  }
+  &.p4{
+    fill: $site_fill_color_p4;
+    stroke: $site_stroke_color_p4;
   }
 }
 
@@ -59,4 +75,49 @@
     position: absolute;
     top: -8.5rem;
   }
+  &__phase{
+    @include media('small') {
+      margin-top: 1rem;
+      position: relative;
+      top: initial;
+    }
+    border: thin solid;
+    border-radius: .8rem;
+    padding: 1rem;
+    margin-right: 0.25rem;
+    position: relative;
+    top: -5rem;
+
+    &bp1{
+      top: -5rem;
+    }
+    
+    &bp2{
+      top: -5rem;
+    }
+
+    &bp3{
+      top: -4.5rem;
+    }
+
+    &bp4{
+      top: -4.5rem;
+    }
+  }
+}
+
+#phase-flex{
+  position:absolute;
+  display:inline-flex;
+  flex-direction:column;
+}
+
+.phase-col {
+  flex-direction: row;
+  margin-bottom: 0.5rem;
+}
+
+.toggled{
+  background-color: $phase-btn-color-toggled;
+  color: $footer-color;
 }

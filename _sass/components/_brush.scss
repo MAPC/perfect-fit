@@ -5,4 +5,17 @@ circle {
 
 circle.active {
   stroke: blue;
+
+  &.p1{
+    stroke: $site_stroke_color_p1;
+  }
+  &.p2{
+    stroke: $site_stroke_color_p2;
+  }
+  &.p3{
+    stroke: $site_stroke_color_p3;
+  }
+  &.p4{
+    stroke: $site_stroke_color_p4;
+  }
 }

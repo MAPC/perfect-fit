@@ -24,8 +24,8 @@ function toggleSelected(d) {
     d3.select(`#site-${d.site_id}`).attr('r', '6px').attr('class', 'site--selected');
     d3.select(`#block-${d.site_id}`).attr('class', 'parking-table__data-row--selected');
   } else {
-    d3.select(`#site-${d.site_id}`).attr('r', '4px').attr('class', 'site');
-    d3.select(`#block-${d.site_id}`).attr('class', 'parking-table__data-row');
+    d3.select(`#site-${d.site_id}`).attr('r', '4px').attr('class', d => `site p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`);
+    d3.select(`#block-${d.site_id}`).attr('class', d => `parking-table__data-row p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`);
   }
 }
 
@@ -61,13 +61,14 @@ function createJobsMapToggle() {
 
 function populateMap(data) {
   const parkingMap = d3.select('.parking-map');
+
   parkingMap.append('g')
     .attr('class', 'parking-map__sites')
     .selectAll('circle')
     .data(data)
     .enter()
     .append('circle')
-    .attr('class', 'site')
+    .attr('class', d=> `site p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`)
     .attr('id', d => `site-${d.site_id}`)
     .attr('cx', d => projection([d.y_coord, d.x_coord])[0])
     .attr('cy', d => projection([d.y_coord, d.x_coord])[1])
@@ -104,7 +105,7 @@ function createSlider(sliderData) {
   const sliderMargin = { top: 0, right: 64, bottom: 50, left: 64 };
   const sliderWidth = +sliderSvg.style('width').slice(0,-2) - sliderMargin.left - sliderMargin.right;
   const sliderHeight = +sliderSvg.attr('height') - sliderMargin.top - sliderMargin.bottom;
-  const g = sliderSvg.append('g').attr('transform', `translate(${sliderMargin.left}, ${sliderMargin.top})`);
+  const g = sliderSvg.append('g').attr('transform', `translate(${sliderMargin.left}, ${sliderMargin.top})`).attr("class", "slider-group");
 
   const sliderX = d3.scaleLinear().domain(d3.extent(park_dem)).range([0, sliderWidth]);
   const sliderY = d3.scaleLinear().domain(d3.extent(utilization)).range([0, sliderHeight]);
@@ -126,11 +127,11 @@ function createSlider(sliderData) {
     .text('Utilization')
 
   const circle = g.append('g')
-    .attr('class', 'circle')
     .selectAll('circle')
     .data(sliderData)
     .enter()
     .append('circle')
+    .attr('class', d => `circle p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`)
     .attr('transform', d => `translate(${sliderX(d.park_dem)}, ${sliderY(d.util_rate)})`)
     .attr('r', 3.5);
 
@@ -260,22 +261,40 @@ function createTable(data) {
     .data(data)
     .enter()
     .append('tr')
-    .attr('class', 'parking-table__data-row')
+    .attr('class', "parking-table__data-row")
     .attr('id', d => `block-${d.site_id}`)
     .on('click', d => toggleSelected(d));
   rows.selectAll('td')
     .data(row => [row.prop_name,
       row.muni,
-      parseFloat(row.park_sup_tot).toFixed(2),
+      row.park_sup_tot != "" ? parseFloat(row.park_sup_tot).toFixed(2) : "--",
       parseFloat(row.park_dem).toFixed(2),
       Math.round(+row.util_rate * 100),
       Math.round(+row.bldg_affp * 100),
       row.walk_score,
-      Number(row.b_umn_t30jobs).toLocaleString()])
+      row.b_umn_t30jobs != "" ? Number(row.b_umn_t30jobs) : "--"])
     .enter()
     .append('td')
     .text(d => d)
     .attr('class', 'parking-table__data-cell');
+}
+
+function refreshVisualization(data){
+  // refresh sites visualization
+  d3.selectAll('.site').remove();
+  d3.selectAll('.parking-map__sites').remove();
+  populateMap(data, projection);
+
+  //refresh table representation
+  d3.selectAll('thead').remove();
+  d3.selectAll('tbody').remove();
+  d3.selectAll('tr').remove();
+  d3.selectAll('td').remove();
+  createTable(data);
+
+  //refresh brush visualization
+  d3.select('.slider-group').remove()
+  createSlider(data)
 }
 
 function createJobMap(data) {
@@ -293,6 +312,21 @@ function createJobMap(data) {
     .attr('fill', d => colors(d.properties.OBJECTID))
     .attr('opacity', '0.8')
     .attr('d', path);
+}
+
+function filterPhaseData(data){
+  phaseData = data[1].filter(site => {
+    phaseSplit = site.phase.split(" ");
+    for(let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++){
+      phaseParse = Number.parseInt(phaseSplit[phaseInd]);
+      if(! Number.isNaN(phaseParse) && phases.includes(phaseSplit[phaseInd])){
+          return true;
+      }
+    }
+    return false;
+  })
+
+  return phaseData;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -322,17 +356,84 @@ window.addEventListener('DOMContentLoaded', () => {
       'WALTHAM',
       'WATERTOWN',
       'WINTHROP'];
-    console.log("DATA: ");
-    console.log(data);
+    phases = ["1", "2", "3", "4"];
+
+    phaseData = filterPhaseData(data);
+
+    const togglePhaseOne = d3.select('.bp1');
+
+    togglePhaseOne.on('click', (d) => {
+      if(phases.includes("1")){
+        phases.splice(phases.indexOf("1"), 1);
+      }
+      else{
+        phases.push("1");
+      }
+      console.log(phases);
+      phaseData = filterPhaseData(data);
+
+      refreshVisualization(phaseData);
+
+      togglePhaseOne.classed('toggled', phases.includes("1"));
+    })
+
+    const togglePhaseTwo = d3.select('.bp2');
+
+    togglePhaseTwo.on('click', (d) => {
+      if(phases.includes("2")){
+        phases.splice(phases.indexOf("2"), 1);
+      }
+      else{
+        phases.push("2");
+      }
+      console.log(phases);
+      phaseData = filterPhaseData(data);
+      refreshVisualization(phaseData);
+
+      togglePhaseTwo.classed('toggled', phases.includes("2"));
+    })
+
+    const togglePhaseThree = d3.select('.bp3');
+
+    togglePhaseThree.on('click', (d) => {
+      if(phases.includes("3")){
+        phases.splice(phases.indexOf("3"), 1);
+      }
+      else{
+        phases.push("3");
+      }
+      console.log(phases);
+      phaseData = filterPhaseData(data);
+      refreshVisualization(phaseData);
+
+      togglePhaseThree.classed('toggled', phases.includes("3"));
+    })
+
+    const togglePhaseFour = d3.select('.bp4');
+
+    togglePhaseFour.on('click', (d) => {
+      if(phases.includes("4")){
+        phases.splice(phases.indexOf("4"), 1);
+      }
+      else{
+        phases.push("4");
+      }
+      console.log(phases);
+      phaseData = filterPhaseData(data);
+      refreshVisualization(phaseData);
+
+      togglePhaseFour.classed('toggled', phases.includes("4"));
+    })
+
     const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.town));
     const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']);
     createTownMap(filteredMunicipalities);
     createJobMap(topology.features);
     createTrainMap(data[2]);
     createRapidTransitMap(data[3]);
-    createTable(data[1]);
-    populateMap(data[1], projection);
-    createSlider(data[1]);
+    createTable(phaseData);
+    populateMap(phaseData, projection);
+    createSlider(phaseData);
     createTransitMapToggle();
     createJobsMapToggle();
   });
