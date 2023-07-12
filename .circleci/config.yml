@@ -26,9 +26,9 @@ jobs:
       - run:
           name: Build static site with Jekyll
           command: bundle exec jekyll build
-      - run:
-          name: Move build artifacts to staging server
-          command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
+      # - run:
+          # name: Move build artifacts to staging server
+          # command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
       
 
 # Orchestrate jobs using workflows
