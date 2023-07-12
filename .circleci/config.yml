@@ -23,6 +23,11 @@ jobs:
       - run:
           name: Build static site with Jekyll
           command: bundle exec jekyll build
+      # - add_ssh_keys: (TODO)
+      - run:
+          name: Move build artifacts to staging server
+          command: rsync -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
+      
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
