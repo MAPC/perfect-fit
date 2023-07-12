@@ -6,6 +6,7 @@ version: 2.1
 # See: https://circleci.com/docs/orb-intro/
 orbs:
   ruby: circleci/ruby@2.0.1
+  aws-white-list-circleci-ip: configure/aws-white-list-circleci-ip@1.0.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -18,6 +19,11 @@ jobs:
       - add_ssh_keys:
           fingerprints:
           - "9a:29:68:ac:a9:9f:56:3b:87:1a:b5:e8:f7:9c:a5:71"
+      - aws-white-list-circleci-ip/add:
+          description: "CircleCI Build"
+          port: 22
+          tag-key: "deployment"
+          tag-value: "CircleCI"
       - checkout
       - run:
           name: Which bundler?
@@ -26,9 +32,9 @@ jobs:
       - run:
           name: Build static site with Jekyll
           command: bundle exec jekyll build
-      # - run:
-          # name: Move build artifacts to staging server
-          # command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
+      - run:
+          name: Move build artifacts to staging server
+          command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
       
 
 # Orchestrate jobs using workflows
