@@ -6,6 +6,7 @@ version: 2.1
 # See: https://circleci.com/docs/orb-intro/
 orbs:
   ruby: circleci/ruby@2.0.1
+  python: circleci/python@2.0.3
   aws-white-list-circleci-ip: configure/aws-white-list-circleci-ip@1.0.1
 
 # Define a job to be invoked later in a workflow.
