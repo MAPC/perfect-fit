@@ -1,8 +1,8 @@
 const projection = d3.geoAlbers()
-  .scale(120000)
+  .scale(85000)
   .rotate([71.057, 0])
   .center([-0.021, 42.38])
-  .translate([960 / 2, 500 / 2]);
+  .translate([960 / 2, 700 / 2]);
 
 let currentSortState = 'ascending';
 
@@ -20,7 +20,7 @@ function camelize(str) {
 }
 
 function toggleSelected(d) {
-  if (d3.select(`#site-${d.site_id}`).attr('class') === 'site') {
+  if (d3.select(`#site-${d.site_id}`).attr('class').includes('site') && !d3.select(`#site-${d.site_id}`).attr('class').includes('selected')) {
     d3.select(`#site-${d.site_id}`).attr('r', '6px').attr('class', 'site--selected');
     d3.select(`#block-${d.site_id}`).attr('class', 'parking-table__data-row--selected');
   } else {
@@ -179,7 +179,7 @@ function createTownMap(data) {
       tooltip.style('display', 'inline');
     })
     .on('mousemove', (d) => {
-      tooltip.text(d.properties.town.toLowerCase().toTitleCase());
+      tooltip.text(d.properties.muni_name.toLowerCase().toTitleCase());
     })
     .on('mouseout', (d) => {
       tooltip.style('display', 'none');
@@ -331,7 +331,7 @@ function filterPhaseData(data){
 
 window.addEventListener('DOMContentLoaded', () => {
   Promise.all([
-    d3.json('./assets/data/ma-munis.json'),
+    d3.json('./assets/data/ma-munis.geojson'),
     d3.csv('./assets/data/perfect-fit-parking-data.csv'),
     d3.json('./assets/data/mbta-commuter-rail-lines.json'),
     d3.json('./assets/data/mbta-rapid-transit.json'),
@@ -355,7 +355,30 @@ window.addEventListener('DOMContentLoaded', () => {
       'REVERE',
       'WALTHAM',
       'WATERTOWN',
-      'WINTHROP'];
+      'WINTHROP',
+      'BEVERLY',
+      'CONCORD',
+      'DANVERS',
+      'LEXINGTON',
+      'SALEM',
+      'SUDBURY',
+      'NEEDHAM',
+      'PEABODY',
+      'LINCOLN',
+      'WAYLAND',
+      'WESTON',
+      'LYNNFIELD',
+      'WAKEFIELD',
+      'SAUGUS',
+      'LYNN',
+      'STONEHAM',
+      'WOBURN',
+      'WELLESLEY',
+      'SWAMPSCOTT',
+      'MARBLEHEAD',
+      'NAHANT',
+      'WINCHESTER'
+    ];
     phases = ["1", "2", "3", "4"];
 
     phaseData = filterPhaseData(data);
@@ -369,7 +392,6 @@ window.addEventListener('DOMContentLoaded', () => {
       else{
         phases.push("1");
       }
-      console.log(phases);
       phaseData = filterPhaseData(data);
 
       refreshVisualization(phaseData);
@@ -386,7 +408,6 @@ window.addEventListener('DOMContentLoaded', () => {
       else{
         phases.push("2");
       }
-      console.log(phases);
       phaseData = filterPhaseData(data);
       refreshVisualization(phaseData);
 
@@ -402,7 +423,6 @@ window.addEventListener('DOMContentLoaded', () => {
       else{
         phases.push("3");
       }
-      console.log(phases);
       phaseData = filterPhaseData(data);
       refreshVisualization(phaseData);
 
@@ -418,14 +438,12 @@ window.addEventListener('DOMContentLoaded', () => {
       else{
         phases.push("4");
       }
-      console.log(phases);
       phaseData = filterPhaseData(data);
       refreshVisualization(phaseData);
 
       togglePhaseFour.classed('toggled', phases.includes("4"));
     })
-
-    const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.town));
+    const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.muni_name.toUpperCase()));
     const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']);
     createTownMap(filteredMunicipalities);
     createJobMap(topology.features);
