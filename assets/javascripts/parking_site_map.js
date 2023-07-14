@@ -123,7 +123,6 @@ function createSlider(sliderData) {
   const y_axis = d3.axisLeft().scale(sliderY).tickFormat(d3.format("~%"));
   const maxX = d3.max(park_dem);
   const minX = d3.min(park_dem);
-  console.log(minX);
 
   g.append('g')
     .attr('class', 'slider__x-axis')
@@ -177,7 +176,6 @@ function createSlider(sliderData) {
       .startAngle(0)
       .endAngle((d, i) => { return i ? Math.PI : -Math.PI; }));
 
-  console.log(brushState);
   if(brushState[1] > maxX){
     if(brushState[0] < minX){
       pastMax = true;
