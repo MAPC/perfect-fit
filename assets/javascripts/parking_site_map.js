@@ -1,8 +1,12 @@
 const projection = d3.geoAlbers()
-  .scale(120000)
+  .scale(85000)
   .rotate([71.057, 0])
   .center([-0.021, 42.38])
-  .translate([960 / 2, 500 / 2]);
+  .translate([960 / 2, 700 / 2]);
+
+let brushState = [0.3, 0.5];
+let pastMax = false;
+let pastMin = false;
 
 let currentSortState = 'ascending';
 
@@ -20,12 +24,12 @@ function camelize(str) {
 }
 
 function toggleSelected(d) {
-  if (d3.select(`#site-${d.site_id}`).attr('class') === 'site') {
+  if (d3.select(`#site-${d.site_id}`).attr('class').includes('site') && !d3.select(`#site-${d.site_id}`).attr('class').includes('selected')) {
     d3.select(`#site-${d.site_id}`).attr('r', '6px').attr('class', 'site--selected');
     d3.select(`#block-${d.site_id}`).attr('class', 'parking-table__data-row--selected');
   } else {
-    d3.select(`#site-${d.site_id}`).attr('r', '4px').attr('class', 'site');
-    d3.select(`#block-${d.site_id}`).attr('class', 'parking-table__data-row');
+    d3.select(`#site-${d.site_id}`).attr('r', '4px').attr('class', d => `site p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`);
+    d3.select(`#block-${d.site_id}`).attr('class', d => `parking-table__data-row p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`);
   }
 }
 
@@ -61,13 +65,14 @@ function createJobsMapToggle() {
 
 function populateMap(data) {
   const parkingMap = d3.select('.parking-map');
+
   parkingMap.append('g')
     .attr('class', 'parking-map__sites')
     .selectAll('circle')
     .data(data)
     .enter()
     .append('circle')
-    .attr('class', 'site')
+    .attr('class', d=> `site p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`)
     .attr('id', d => `site-${d.site_id}`)
     .attr('cx', d => projection([d.y_coord, d.x_coord])[0])
     .attr('cy', d => projection([d.y_coord, d.x_coord])[1])
@@ -83,6 +88,12 @@ function brushmoved(x, circle, sliderHeight, sliderData) {
     circle.classed('active', false);
   } else {
     const sx = s.map(x.invert);
+    if(!pastMax){
+      brushState[1] = sx[1];
+    }
+    if(!pastMin){
+      brushState[0] = sx[0];
+    }
     circle.classed('active', d => sx[0] <= d.park_dem && d.park_dem <= sx[1]);
     handle.attr('display', null).attr('transform', (d, i) => `translate(${s[i]}, ${sliderHeight / 2})`);
     const filteredSliderData = sliderData.filter(d => sx[0] <= d.park_dem && d.park_dem <= sx[1]);
@@ -101,13 +112,17 @@ function createSlider(sliderData) {
   const park_dem = sliderData.map(object => object.park_dem);
   const utilization = sliderData.map(object => object.util_rate);
   const sliderSvg = d3.select('.slider');
-  const sliderMargin = { top: 0, right: 64, bottom: 50, left: 64 };
+  const sliderMargin = { top: 5, right: 64, bottom: 50, left: 64 };
   const sliderWidth = +sliderSvg.style('width').slice(0,-2) - sliderMargin.left - sliderMargin.right;
   const sliderHeight = +sliderSvg.attr('height') - sliderMargin.top - sliderMargin.bottom;
-  const g = sliderSvg.append('g').attr('transform', `translate(${sliderMargin.left}, ${sliderMargin.top})`);
+  const g = sliderSvg.append('g').attr('transform', `translate(${sliderMargin.left}, ${sliderMargin.top})`).attr("class", "slider-group");
 
   const sliderX = d3.scaleLinear().domain(d3.extent(park_dem)).range([0, sliderWidth]);
   const sliderY = d3.scaleLinear().domain(d3.extent(utilization)).range([0, sliderHeight]);
+
+  const y_axis = d3.axisLeft().scale(sliderY).tickFormat(d3.format("~%"));
+  const maxX = d3.max(park_dem);
+  const minX = d3.min(park_dem);
 
   g.append('g')
     .attr('class', 'slider__x-axis')
@@ -118,19 +133,24 @@ function createSlider(sliderData) {
     .attr('class', 'slider__x-axis-label')
     .attr('transform', `translate(${sliderWidth / 2}, ${sliderHeight + 35})`)
     .attr('text-anchor', 'middle')
-    .text('Demand Per Unit');
+    .text('Parking Demand Per Unit');
+
+  g.append('g')
+    .attr('class', 'slider__y-axis')
+    .call(y_axis);
+    // .tickFormat(d3.format("~%"));
 
   g.append('text')
     .attr('class', 'slider__y-axis-label')
-    .attr('transform', `rotate(-90) translate(-${sliderHeight - 15} , 0)`)
-    .text('Utilization')
+    .attr('transform', `rotate(-90) translate(-${sliderHeight} , -37)`)
+    .text('Parking Utilization')
 
   const circle = g.append('g')
-    .attr('class', 'circle')
     .selectAll('circle')
     .data(sliderData)
     .enter()
     .append('circle')
+    .attr('class', d => `circle p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`)
     .attr('transform', d => `translate(${sliderX(d.park_dem)}, ${sliderY(d.util_rate)})`)
     .attr('r', 3.5);
 
@@ -141,7 +161,6 @@ function createSlider(sliderData) {
   const gBrush = g.append('g')
     .attr('class', 'brush')
     .call(brush);
-
   gBrush.selectAll('.handle--custom')
     .data([{ type: 'w' }, { type: 'e' }])
     .enter().append('path')
@@ -157,7 +176,31 @@ function createSlider(sliderData) {
       .startAngle(0)
       .endAngle((d, i) => { return i ? Math.PI : -Math.PI; }));
 
-  gBrush.call(brush.move, [0.3, 0.5].map(sliderX));
+  if(brushState[1] > maxX){
+    if(brushState[0] < minX){
+      pastMax = true;
+      pastMin = true;
+      gBrush.call(brush.move, [minX, maxX].map(sliderX));
+    }
+    else{
+      pastMin = false;
+      pastMax = true;
+      gBrush.call(brush.move, [brushState[0], maxX].map(sliderX));
+    }
+  }
+  else{
+    if(brushState[0] < minX){
+      pastMin = true;
+      pastMax = false;
+      gBrush.call(brush.move, [minX ,brushState[1]].map(sliderX));
+    }
+    else{
+      pastMin = false;
+      pastMax = false;
+      gBrush.call(brush.move, brushState.map(sliderX));
+    }
+  }
+  
 }
 
 function createTownMap(data) {
@@ -178,7 +221,7 @@ function createTownMap(data) {
       tooltip.style('display', 'inline');
     })
     .on('mousemove', (d) => {
-      tooltip.text(d.properties.town.toLowerCase().toTitleCase());
+      tooltip.text(d.properties.muni_name.toLowerCase().toTitleCase());
     })
     .on('mouseout', (d) => {
       tooltip.style('display', 'none');
@@ -260,22 +303,40 @@ function createTable(data) {
     .data(data)
     .enter()
     .append('tr')
-    .attr('class', 'parking-table__data-row')
+    .attr('class', "parking-table__data-row")
     .attr('id', d => `block-${d.site_id}`)
     .on('click', d => toggleSelected(d));
   rows.selectAll('td')
     .data(row => [row.prop_name,
       row.muni,
-      parseFloat(row.park_sup_tot).toFixed(2),
+      row.park_sup_tot != "" ? parseFloat(row.park_sup_tot).toFixed(2) : "--",
       parseFloat(row.park_dem).toFixed(2),
       Math.round(+row.util_rate * 100),
       Math.round(+row.bldg_affp * 100),
       row.walk_score,
-      Number(row.b_umn_t30jobs).toLocaleString()])
+      row.b_umn_t30jobs != "" ? Number(row.b_umn_t30jobs) : "--"])
     .enter()
     .append('td')
     .text(d => d)
     .attr('class', 'parking-table__data-cell');
+}
+
+function refreshVisualization(data){
+  // refresh sites visualization
+  d3.selectAll('.site').remove();
+  d3.selectAll('.parking-map__sites').remove();
+  populateMap(data, projection);
+
+  //refresh table representation
+  d3.selectAll('thead').remove();
+  d3.selectAll('tbody').remove();
+  d3.selectAll('tr').remove();
+  d3.selectAll('td').remove();
+  createTable(data);
+
+  //refresh brush visualization
+  d3.select('.slider-group').remove()
+  createSlider(data)
 }
 
 function createJobMap(data) {
@@ -295,9 +356,24 @@ function createJobMap(data) {
     .attr('d', path);
 }
 
+function filterPhaseData(data){
+  phaseData = data[1].filter(site => {
+    phaseSplit = site.phase.split(" ");
+    for(let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++){
+      phaseParse = Number.parseInt(phaseSplit[phaseInd]);
+      if(! Number.isNaN(phaseParse) && phases.includes(phaseSplit[phaseInd])){
+          return true;
+      }
+    }
+    return false;
+  })
+
+  return phaseData;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   Promise.all([
-    d3.json('./assets/data/ma-munis.json'),
+    d3.json('./assets/data/ma-munis.geojson'),
     d3.csv('./assets/data/perfect-fit-parking-data.csv'),
     d3.json('./assets/data/mbta-commuter-rail-lines.json'),
     d3.json('./assets/data/mbta-rapid-transit.json'),
@@ -321,16 +397,105 @@ window.addEventListener('DOMContentLoaded', () => {
       'REVERE',
       'WALTHAM',
       'WATERTOWN',
-      'WINTHROP'];
-    const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.town));
+      'WINTHROP',
+      'BEVERLY',
+      'CONCORD',
+      'DANVERS',
+      'LEXINGTON',
+      'SALEM',
+      'SUDBURY',
+      'NEEDHAM',
+      'PEABODY',
+      'LINCOLN',
+      'WAYLAND',
+      'WESTON',
+      'LYNNFIELD',
+      'WAKEFIELD',
+      'SAUGUS',
+      'LYNN',
+      'STONEHAM',
+      'WOBURN',
+      'WELLESLEY',
+      'SWAMPSCOTT',
+      'MARBLEHEAD',
+      'NAHANT',
+      'WINCHESTER'
+    ];
+    phases = ["1", "2", "3", "4"];
+
+    phaseData = filterPhaseData(data);
+
+    const togglePhaseOne = d3.select('.bp1');
+
+    togglePhaseOne.on('click', (d) => {
+      if(phases.includes("1") && phases.includes("2")){
+        phases.splice(phases.indexOf("1"), 1);
+        phases.splice(phases.indexOf("2"), 1);
+      }
+      else{
+        phases.push("1");
+        phases.push("2");
+      }
+      phaseData = filterPhaseData(data);
+
+      refreshVisualization(phaseData);
+
+      togglePhaseOne.classed('toggled__p1', phases.includes("1") && phases.includes("2"));
+    })
+
+    const togglePhaseTwo = d3.select('.bp2');
+
+    togglePhaseTwo.on('click', (d) => {
+      if(phases.includes("2")){
+        phases.splice(phases.indexOf("2"), 1);
+      }
+      else{
+        phases.push("2");
+      }
+      phaseData = filterPhaseData(data);
+      refreshVisualization(phaseData);
+
+      togglePhaseTwo.classed('toggled__p2', phases.includes("2"));
+    })
+
+    const togglePhaseThree = d3.select('.bp3');
+
+    togglePhaseThree.on('click', (d) => {
+      if(phases.includes("3")){
+        phases.splice(phases.indexOf("3"), 1);
+      }
+      else{
+        phases.push("3");
+      }
+      phaseData = filterPhaseData(data);
+      refreshVisualization(phaseData);
+
+      togglePhaseThree.classed('toggled__p3', phases.includes("3"));
+    })
+
+    const togglePhaseFour = d3.select('.bp4');
+
+    togglePhaseFour.on('click', (d) => {
+      if(phases.includes("4")){
+        phases.splice(phases.indexOf("4"), 1);
+      }
+      else{
+        phases.push("4");
+      }
+      phaseData = filterPhaseData(data);
+      refreshVisualization(phaseData);
+
+      togglePhaseFour.classed('toggled__p4', phases.includes("4"));
+    })
+    const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.muni_name.toUpperCase()));
     const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']);
     createTownMap(filteredMunicipalities);
     createJobMap(topology.features);
     createTrainMap(data[2]);
     createRapidTransitMap(data[3]);
-    createTable(data[1]);
-    populateMap(data[1], projection);
-    createSlider(data[1]);
+    createTable(phaseData);
+    populateMap(phaseData, projection);
+    createSlider(phaseData);
     createTransitMapToggle();
     createJobsMapToggle();
   });
