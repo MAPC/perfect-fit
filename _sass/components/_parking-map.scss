@@ -60,7 +60,8 @@
     border-radius: .8rem;
     padding: 1rem;
     position: absolute;
-    top: -32rem;
+    right: 1rem;
+    top: -8.25rem;
     width: 10rem;
   }
 
@@ -74,7 +75,8 @@
     border-radius: .8rem;
     padding: 1rem;
     position: absolute;
-    top: -28.5rem;
+    top: -4.75rem;
+    right: 1rem;
     width: 10rem;
   }
   &__phase{
@@ -87,35 +89,22 @@
     border-radius: .8rem;
     padding: 1rem;
     position: relative;
-    top: -8.25rem;
-
-    &bp1{
-      top: -5rem;
-    }
-    
-    &bp2{
-      top: -5rem;
-    }
-
-    &bp3{
-      top: -4.5rem;
-    }
-
-    &bp4{
-      top: -4.5rem;
-    }
+    top: -4.75rem;
+    left: -2.5rem;
+    width: 7rem;
   }
 }
 
 #phase-flex{
   position:absolute;
   display:inline-flex;
-  flex-direction:column;
+  flex-direction:row;
 }
 
 .phase-col {
   flex-direction: row;
   margin-bottom: 0.25rem;
+  margin-left: 0.25rem;
 }
 
 .toggled{
@@ -124,17 +113,21 @@
   &__p1{
     background-color: $site_fill_color_p2;
     color: $footer-color;
+    width: 7rem;
   }
   &__p2{
     background-color: $site_fill_color_p2;
     color: $footer-color;
+    width: 7rem;
   }
   &__p3{
     background-color: $site_fill_color_p3;
     color: $footer-color;
+    width: 7rem;
   }
   &__p4{
     background-color: $site_fill_color_p4;
     color: $footer-color;
+    width: 7rem;
   }
 }

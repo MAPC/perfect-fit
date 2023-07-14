@@ -4,6 +4,10 @@ const projection = d3.geoAlbers()
   .center([-0.021, 42.38])
   .translate([960 / 2, 700 / 2]);
 
+let brushState = [0.3, 0.5];
+let pastMax = false;
+let pastMin = false;
+
 let currentSortState = 'ascending';
 
 function sortText(a, b) {
@@ -84,6 +88,12 @@ function brushmoved(x, circle, sliderHeight, sliderData) {
     circle.classed('active', false);
   } else {
     const sx = s.map(x.invert);
+    if(!pastMax){
+      brushState[1] = sx[1];
+    }
+    if(!pastMin){
+      brushState[0] = sx[0];
+    }
     circle.classed('active', d => sx[0] <= d.park_dem && d.park_dem <= sx[1]);
     handle.attr('display', null).attr('transform', (d, i) => `translate(${s[i]}, ${sliderHeight / 2})`);
     const filteredSliderData = sliderData.filter(d => sx[0] <= d.park_dem && d.park_dem <= sx[1]);
@@ -102,13 +112,18 @@ function createSlider(sliderData) {
   const park_dem = sliderData.map(object => object.park_dem);
   const utilization = sliderData.map(object => object.util_rate);
   const sliderSvg = d3.select('.slider');
-  const sliderMargin = { top: 0, right: 64, bottom: 50, left: 64 };
+  const sliderMargin = { top: 5, right: 64, bottom: 50, left: 64 };
   const sliderWidth = +sliderSvg.style('width').slice(0,-2) - sliderMargin.left - sliderMargin.right;
   const sliderHeight = +sliderSvg.attr('height') - sliderMargin.top - sliderMargin.bottom;
   const g = sliderSvg.append('g').attr('transform', `translate(${sliderMargin.left}, ${sliderMargin.top})`).attr("class", "slider-group");
 
   const sliderX = d3.scaleLinear().domain(d3.extent(park_dem)).range([0, sliderWidth]);
   const sliderY = d3.scaleLinear().domain(d3.extent(utilization)).range([0, sliderHeight]);
+
+  const y_axis = d3.axisLeft().scale(sliderY).tickFormat(d3.format("~%"));
+  const maxX = d3.max(park_dem);
+  const minX = d3.min(park_dem);
+  console.log(minX);
 
   g.append('g')
     .attr('class', 'slider__x-axis')
@@ -119,12 +134,17 @@ function createSlider(sliderData) {
     .attr('class', 'slider__x-axis-label')
     .attr('transform', `translate(${sliderWidth / 2}, ${sliderHeight + 35})`)
     .attr('text-anchor', 'middle')
-    .text('Demand Per Unit');
+    .text('Parking Demand Per Unit');
+
+  g.append('g')
+    .attr('class', 'slider__y-axis')
+    .call(y_axis);
+    // .tickFormat(d3.format("~%"));
 
   g.append('text')
     .attr('class', 'slider__y-axis-label')
-    .attr('transform', `rotate(-90) translate(-${sliderHeight - 15} , 0)`)
-    .text('Utilization')
+    .attr('transform', `rotate(-90) translate(-${sliderHeight} , -37)`)
+    .text('Parking Utilization')
 
   const circle = g.append('g')
     .selectAll('circle')
@@ -142,7 +162,6 @@ function createSlider(sliderData) {
   const gBrush = g.append('g')
     .attr('class', 'brush')
     .call(brush);
-
   gBrush.selectAll('.handle--custom')
     .data([{ type: 'w' }, { type: 'e' }])
     .enter().append('path')
@@ -158,7 +177,32 @@ function createSlider(sliderData) {
       .startAngle(0)
       .endAngle((d, i) => { return i ? Math.PI : -Math.PI; }));
 
-  gBrush.call(brush.move, [0.3, 0.5].map(sliderX));
+  console.log(brushState);
+  if(brushState[1] > maxX){
+    if(brushState[0] < minX){
+      pastMax = true;
+      pastMin = true;
+      gBrush.call(brush.move, [minX, maxX].map(sliderX));
+    }
+    else{
+      pastMin = false;
+      pastMax = true;
+      gBrush.call(brush.move, [brushState[0], maxX].map(sliderX));
+    }
+  }
+  else{
+    if(brushState[0] < minX){
+      pastMin = true;
+      pastMax = false;
+      gBrush.call(brush.move, [minX ,brushState[1]].map(sliderX));
+    }
+    else{
+      pastMin = false;
+      pastMax = false;
+      gBrush.call(brush.move, brushState.map(sliderX));
+    }
+  }
+  
 }
 
 function createTownMap(data) {
@@ -386,17 +430,19 @@ window.addEventListener('DOMContentLoaded', () => {
     const togglePhaseOne = d3.select('.bp1');
 
     togglePhaseOne.on('click', (d) => {
-      if(phases.includes("1")){
+      if(phases.includes("1") && phases.includes("2")){
         phases.splice(phases.indexOf("1"), 1);
+        phases.splice(phases.indexOf("2"), 1);
       }
       else{
         phases.push("1");
+        phases.push("2");
       }
       phaseData = filterPhaseData(data);
 
       refreshVisualization(phaseData);
 
-      togglePhaseOne.classed('toggled__p1', phases.includes("1"));
+      togglePhaseOne.classed('toggled__p1', phases.includes("1") && phases.includes("2"));
     })
 
     const togglePhaseTwo = d3.select('.bp2');
