@@ -221,7 +221,7 @@ body {
 
   display: grid;
   grid-template-columns: 60% 40%;
-  margin: 5rem auto;
+  margin: 0rem 0rem 3.5rem 0rem;
 
   &__center {
     margin: 0 auto;
@@ -321,6 +321,56 @@ body {
 
     font-size: 1.5rem;
   }
+}
+
+.push{
+  width: 100%;
+  &__notification{
+    @include media(small) {
+      margin: 1rem auto;
+    }
+
+    width: calc(100vw - 13rem);
+    border-radius: .8rem;
+    box-shadow: 0 3px 20px rgba(13, 14, 242, .16);
+    display: flex;
+    flex-wrap: wrap;
+    margin: 4rem 1rem 0rem 4rem;
+    padding: 3rem 2rem 2.5rem;
+    background-color: $footer-background-color;
+    color: $footer-color;
+  }
+
+  &__heading{
+    @include media(large) {
+      font-size: 1.1rem;
+    }
+    color: $footer-color;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  &__button{
+    background-color: $footer-color;
+    border-radius: 50rem;
+    color: $footer-background-color;
+    display: inline-block;
+    font-size: 1rem;
+    padding: 1em 1em 1em 1em;
+    margin-top: 2rem;
+    text-decoration: none;
+    width: 10em;
+    text-align-last: center;
+  }
+}
+
+
+
+.mr{
+  margin-right: 0.5rem;
 }
 
 .explore-the-data {

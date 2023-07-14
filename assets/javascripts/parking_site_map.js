@@ -396,7 +396,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       refreshVisualization(phaseData);
 
-      togglePhaseOne.classed('toggled', phases.includes("1"));
+      togglePhaseOne.classed('toggled__p1', phases.includes("1"));
     })
 
     const togglePhaseTwo = d3.select('.bp2');
@@ -411,7 +411,7 @@ window.addEventListener('DOMContentLoaded', () => {
       phaseData = filterPhaseData(data);
       refreshVisualization(phaseData);
 
-      togglePhaseTwo.classed('toggled', phases.includes("2"));
+      togglePhaseTwo.classed('toggled__p2', phases.includes("2"));
     })
 
     const togglePhaseThree = d3.select('.bp3');
@@ -426,7 +426,7 @@ window.addEventListener('DOMContentLoaded', () => {
       phaseData = filterPhaseData(data);
       refreshVisualization(phaseData);
 
-      togglePhaseThree.classed('toggled', phases.includes("3"));
+      togglePhaseThree.classed('toggled__p3', phases.includes("3"));
     })
 
     const togglePhaseFour = d3.select('.bp4');
@@ -441,7 +441,7 @@ window.addEventListener('DOMContentLoaded', () => {
       phaseData = filterPhaseData(data);
       refreshVisualization(phaseData);
 
-      togglePhaseFour.classed('toggled', phases.includes("4"));
+      togglePhaseFour.classed('toggled__p4', phases.includes("4"));
     })
     const filteredMunicipalities = data[0].features.filter(municipality => surveyedMunicipalities.includes(municipality.properties.muni_name.toUpperCase()));
     const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']);

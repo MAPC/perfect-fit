@@ -120,5 +120,21 @@
 
 .toggled{
   background-color: $phase-btn-color-toggled;
-  color: $footer-color;
+
+  &__p1{
+    background-color: $site_fill_color_p2;
+    color: $footer-color;
+  }
+  &__p2{
+    background-color: $site_fill_color_p2;
+    color: $footer-color;
+  }
+  &__p3{
+    background-color: $site_fill_color_p3;
+    color: $footer-color;
+  }
+  &__p4{
+    background-color: $site_fill_color_p4;
+    color: $footer-color;
+  }
 }
