@@ -20,8 +20,6 @@ jobs:
       - run:
           name: Install Python
           command: sudo apt-get update && sudo apt-get install -y python3 python-is-python3 python3.10-venv
-      - aws-cli/setup:
-          profile_name: TODO
       - add_ssh_keys:
           fingerprints:
           - "9a:29:68:ac:a9:9f:56:3b:87:1a:b5:e8:f7:9c:a5:71"
