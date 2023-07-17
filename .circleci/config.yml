@@ -30,6 +30,7 @@ jobs:
       - run:
           name: Build static site with Jekyll
           command: bundle exec jekyll build
+      - aws-cli/setup
       - run:
               name: AWS whitelist add CircleCI IP
               command: |
@@ -44,10 +45,11 @@ jobs:
 
                   GROUPID=sg-e9bc309e
                   [[ -n "${GROUPID}" ]] || (echo "Could not determine Security Group ID" && exit 0);
+                  PORT=443
                                                       
                   # Adding Rule SSH to Your Security Group
                   echo Allowing CircleCI Build to access port $PORT from IP $IP to the security group $GROUPID
-                  aws ec2 authorize-security-group-ingress --group-id $GROUPID --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "'$LATEST_IP/32'", "Description": "CircleCI Build"}]}]'                 
+                  aws ec2 authorize-security-group-ingress --group-id $GROUPID --ip-permissions '[{"IpProtocol": "tcp", "FromPort": $PORT, "ToPort": $PORT, "IpRanges": [{"CidrIp": "'$LATEST_IP/32'", "Description": "'CircleCI Build'"}]}]'                 
       - run:
           name: Move build artifacts to staging server
           command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
