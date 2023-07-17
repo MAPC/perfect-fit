@@ -11,7 +11,7 @@ orbs:
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  build:
+  build_and_deploy:
     docker:
       - image: cimg/ruby:3.2.2
     executor: ruby/default
@@ -72,4 +72,4 @@ workflows:
   staging-build-deploy: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build
+      - build_and_deploy
