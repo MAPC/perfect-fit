@@ -33,7 +33,6 @@ jobs:
           command: bundle exec jekyll build
       - aws-white-list-circleci-ip/add:
           description: "CircleCI Build"
-          port: 22
           tag-key: "deployment"
           tag-value: "CircleCI"
       - run:
@@ -41,7 +40,6 @@ jobs:
           command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
       - aws-white-list-circleci-ip/remove:
           description: "CircleCI Build"
-          port: 22
           tag-key: "deployment"
           tag-value: "CircleCI"
       
