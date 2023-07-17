@@ -7,7 +7,6 @@ version: 2.1
 orbs:
   ruby: circleci/ruby@2.0.1
   aws-cli: circleci/aws-cli@4.0.0
-  aws-white-list-circleci-ip: configure/aws-white-list-circleci-ip@1.0.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -31,17 +30,27 @@ jobs:
       - run:
           name: Build static site with Jekyll
           command: bundle exec jekyll build
-      - aws-white-list-circleci-ip/add:
-          description: "CircleCI Build"
-          tag-key: "deployment"
-          tag-value: "CircleCI"
+      - run:
+              name: AWS whitelist add CircleCI IP
+              command: |
+                  
+                  # Get the public ip address
+                  LATEST_IP=$(wget -qO- http://checkip.amazonaws.com)
+                  IP="${IP-$LATEST_IP}"
+                  if [[ "${IP}" == "" ]]; then
+                    echo "Could not find your public IP"
+                    exit 1
+                  fi
+
+                  GROUPID=sg-e9bc309e
+                  [[ -n "${GROUPID}" ]] || (echo "Could not determine Security Group ID" && exit 0);
+                                                      
+                  # Adding Rule SSH to Your Security Group
+                  echo Allowing CircleCI Build to access port $PORT from IP $IP to the security group $GROUPID
+                  aws ec2 authorize-security-group-ingress --group-id $GROUPID --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "'$LATEST_IP/32'", "Description": "CircleCI Build"}]}]'                 
       - run:
           name: Move build artifacts to staging server
           command: scp -r _site/* perfect-fit@prep.mapc.org:/var/www/perfect-fit
-      - aws-white-list-circleci-ip/remove:
-          description: "CircleCI Build"
-          tag-key: "deployment"
-          tag-value: "CircleCI"
       
 
 # Orchestrate jobs using workflows
