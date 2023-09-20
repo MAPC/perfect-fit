@@ -4,7 +4,7 @@ const projection = d3.geoAlbers()
   .center([-0.021, 42.38])
   .translate([960 / 2, 700 / 2]);
 
-let brushState = [0.3, 0.5];
+let brushState = [0.0, 2.0];
 let pastMax = false;
 let pastMin = false;
 
