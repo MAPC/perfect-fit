@@ -307,7 +307,7 @@ function createTable(data) {
     .attr('id', d => `block-${d.site_id}`)
     .on('click', d => toggleSelected(d));
   rows.selectAll('td')
-    .data(row => [row.prop_name,
+    .data(row => [row.prop_name? row.prop_name : `${row.add_num} ${row.add_str}`,
       row.muni,
       row.park_sup_tot != "" ? parseFloat(row.park_sup_tot).toFixed(2) : "--",
       parseFloat(row.park_dem).toFixed(2),
