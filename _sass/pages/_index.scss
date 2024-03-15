@@ -309,9 +309,8 @@ body {
     color: white;
     display: inline-block;
     font-size: 1rem;
-    padding: 1em 2.2em 1em 0;
+    padding: 1rem 2rem;
     text-decoration: none;
-    width: 7em;
   }
 
   &__text {
@@ -359,10 +358,9 @@ body {
     color: $footer-background-color;
     display: inline-block;
     font-size: 1rem;
-    padding: 1em 1em 1em 1em;
+    padding: 1em 2em;
     margin-top: 2rem;
     text-decoration: none;
-    width: 10em;
     text-align-last: center;
   }
 }
