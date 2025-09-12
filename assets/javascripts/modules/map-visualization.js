@@ -87,6 +87,8 @@ export function createRapidTransitMap(data, selector = '.parking-map') {
  */
 export function populateMap(data, selector = '.parking-map', toggleFunction) {
   const parkingMap = d3.select(selector);
+  const isFullScreen = selector.includes('fullscreen');
+  const siteIdPrefix = isFullScreen ? 'site-fullscreen-' : 'site-';
 
   parkingMap.append('g')
     .attr('class', 'parking-map__sites')
@@ -95,7 +97,7 @@ export function populateMap(data, selector = '.parking-map', toggleFunction) {
     .enter()
     .append('circle')
     .attr('class', d=> `site p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`)
-    .attr('id', d => `site-${d.site_id}`)
+    .attr('id', d => `${siteIdPrefix}${d.site_id}`)
     .attr('cx', d => projection([d.y_coord, d.x_coord])[0])
     .attr('cy', d => projection([d.y_coord, d.x_coord])[1])
     .attr('r', '4px')
@@ -114,7 +116,8 @@ export function highlightMunicipality(municipalityName, selector = '.parking-map
   // If a specific municipality is selected, highlight it
   if (municipalityName && municipalityName !== 'all') {
     const municipalityId = `municipality-${municipalityName.toLowerCase().replace(/\s+/g, '-')}`;
-    d3.select(`#${municipalityId}`)
+    // Use scoped selector to avoid affecting other maps
+    d3.select(`${selector} #${municipalityId}`)
       .attr('fill', '#F0E0AB')
       .attr('fill-opacity', 0.5);
   }

@@ -4,7 +4,7 @@
 
 import { projection, getGlobalState, updateGlobalState } from './core-utils.js';
 import { createTownMap, createJobMap, createTrainMap, createRapidTransitMap, populateMap, highlightMunicipality } from './map-visualization.js';
-import { createTable } from './table.js';
+import { createTable, toggleSelected } from './table.js';
 import { createSlider } from './slider.js';
 import { filterPhaseData, filterMunicipalityData } from './data-filtering.js';
 
@@ -50,13 +50,13 @@ export function initializeFullScreenVisualization() {
     createRapidTransitMap(currentState.allData[3], '#fullscreen-popup .parking-map');
     
     // Populate map with sites
-    populateMap(currentFilteredData, '#fullscreen-popup .parking-map', toggleSelectedForFullScreen);
+    populateMap(currentFilteredData, '#fullscreen-popup .parking-map', (d) => toggleSelected(d, true));
     
     // Create table
     createTable(currentFilteredData, '#fullscreen-popup .parking-table');
     
     // Create slider
-    createSlider(currentFilteredData, '#fullscreen-popup .slider', true);
+    createSlider(currentFilteredData, '#fullscreen-popup', true);
     
     // Populate municipality dropdown for full screen
     populateMunicipalityDropdownForFullScreen(currentPhaseData);
@@ -67,9 +67,8 @@ export function initializeFullScreenVisualization() {
     // Reset municipality dropdown to "all"
     d3.select('#municipality-select-fullscreen').property('value', 'all');
     
-    // Reset all phase buttons to active state
-    d3.select('#fullscreen-popup .bp1').classed('toggled__p1', true);
-    d3.select('#fullscreen-popup .bp2').classed('toggled__p2', true);
+    // Reset all phase buttons to active state (matching normal mode logic)
+    d3.select('#fullscreen-popup .bp1').classed('toggled__p1', true); // Phase 1 & 2 combined
     d3.select('#fullscreen-popup .bp3').classed('toggled__p3', true);
     d3.select('#fullscreen-popup .bp4').classed('toggled__p4', true);
     d3.select('#fullscreen-popup .bp5').classed('toggled__p5', true);
@@ -86,18 +85,6 @@ export function initializeFullScreenVisualization() {
   }
 }
 
-/**
- * Toggle site selection for full screen
- */
-function toggleSelectedForFullScreen(d) {
-  if (d3.select(`#site-fullscreen-${d.site_id}`).attr('class').includes('site') && !d3.select(`#site-fullscreen-${d.site_id}`).attr('class').includes('selected')) {
-    d3.select(`#site-fullscreen-${d.site_id}`).attr('r', '6px').attr('class', 'site--selected');
-    d3.select(`#block-fullscreen-${d.site_id}`).attr('class', 'parking-table__data-row--selected');
-  } else {
-    d3.select(`#site-fullscreen-${d.site_id}`).attr('r', '4px').attr('class', d => `site p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`);
-    d3.select(`#block-fullscreen-${d.site_id}`).attr('class', d => `parking-table__data-row p${d.phase.replace(/[^0-9]/g,"").split("").join(" p")}`);
-  }
-}
 
 /**
  * Populate municipality dropdown for full screen
@@ -143,18 +130,37 @@ function setupFullScreenControls() {
   // Set up municipality filter for full screen
   d3.select('#municipality-select-fullscreen').on('change', function() {
     const state = getGlobalState();
-    updateGlobalState({ ...state, selectedMunicipality: this.value });
     
+    // Highlight the selected municipality on the fullscreen map (don't affect global state)
     highlightMunicipality(this.value, '#fullscreen-popup .parking-map');
     
-    if (this.value !== 'all') {
-      updateGlobalState({ ...state, phases: ["1", "2", "3", "4", "5"] });
-      const newPhaseData = filterPhaseData(state.allData);
-      updateGlobalState({ ...state, phaseData: newPhaseData });
-    }
+    // Update phase button visual states (always show all phases as selected)
+    d3.select('#fullscreen-popup .bp1').classed('toggled__p1', true);
+    d3.select('#fullscreen-popup .bp3').classed('toggled__p3', true);
+    d3.select('#fullscreen-popup .bp4').classed('toggled__p4', true);
+    d3.select('#fullscreen-popup .bp5').classed('toggled__p5', true);
     
-    const currentState = getGlobalState();
-    const filteredData = filterMunicipalityData(currentState.phaseData);
+    // Filter data locally for fullscreen (don't affect global state)
+    const allPhases = ["1", "2", "3", "4", "5"];
+    const selectedMunicipality = this.value;
+    
+    // Filter by phases (all phases active)
+    const phaseFilteredData = state.allData[1].filter(site => {
+      const phaseSplit = site.phase.split(" ");
+      for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
+        const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
+        if (!Number.isNaN(phaseParse) && allPhases.includes(phaseSplit[phaseInd])) {
+          return true;
+        }
+      }
+      return false;
+    });
+    
+    // Filter by municipality
+    const filteredData = selectedMunicipality === 'all' 
+      ? phaseFilteredData 
+      : phaseFilteredData.filter(site => site.muni === selectedMunicipality);
+    
     refreshFullScreenVisualization(filteredData);
   });
 
@@ -185,29 +191,85 @@ function setupFullScreenPhaseButtons() {
     }
   });
 
-  ['bp1', 'bp2', 'bp3', 'bp4', 'bp5'].forEach((buttonClass, index) => {
+  // Phase 1 & 2 button (local fullscreen state only)
+  d3.select('#fullscreen-popup .bp1').on('click', (d) => {
+    const state = getGlobalState();
+    const currentMunicipality = d3.select('#municipality-select-fullscreen').property('value');
+    
+    // Toggle phases locally for fullscreen (don't affect global state)
+    const isActive = d3.select('#fullscreen-popup .bp1').classed('toggled__p1');
+    const phases = isActive ? ["3", "4", "5"] : ["1", "2", "3", "4", "5"];
+    
+    // Update button visual state
+    d3.select('#fullscreen-popup .bp1').classed('toggled__p1', !isActive);
+    
+    // Filter data locally for fullscreen
+    const phaseFilteredData = state.allData[1].filter(site => {
+      const phaseSplit = site.phase.split(" ");
+      for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
+        const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
+        if (!Number.isNaN(phaseParse) && phases.includes(phaseSplit[phaseInd])) {
+          return true;
+        }
+      }
+      return false;
+    });
+    
+    // Filter by municipality
+    const filteredData = currentMunicipality === 'all' 
+      ? phaseFilteredData 
+      : phaseFilteredData.filter(site => site.muni === currentMunicipality);
+    
+    refreshFullScreenVisualization(filteredData);
+  });
+
+  // Phase 3, 4, 5 buttons (local fullscreen state only)
+  ['bp3', 'bp4', 'bp5'].forEach((buttonClass, index) => {
     d3.select(`#fullscreen-popup .${buttonClass}`).on('click', (d) => {
       try {
-        const currentState = getGlobalState();
-        const phaseNum = (index + 1).toString();
+        const state = getGlobalState();
+        const currentMunicipality = d3.select('#municipality-select-fullscreen').property('value');
+        const phaseNum = (index + 3).toString(); // bp3 = phase 3, bp4 = phase 4, bp5 = phase 5
         
-        // Toggle phase logic here
-        if (currentState.phases.includes(phaseNum)) {
-          currentState.phases.splice(currentState.phases.indexOf(phaseNum), 1);
-        } else {
-          currentState.phases.push(phaseNum);
+        // Toggle phase locally for fullscreen (don't affect global state)
+        const isActive = d3.select(`#fullscreen-popup .${buttonClass}`).classed(`toggled__p${phaseNum}`);
+        d3.select(`#fullscreen-popup .${buttonClass}`).classed(`toggled__p${phaseNum}`, !isActive);
+        
+        // Get current active phases from button states
+        const activePhases = [];
+        if (d3.select('#fullscreen-popup .bp1').classed('toggled__p1')) {
+          activePhases.push("1", "2");
+        }
+        if (d3.select('#fullscreen-popup .bp3').classed('toggled__p3')) {
+          activePhases.push("3");
+        }
+        if (d3.select('#fullscreen-popup .bp4').classed('toggled__p4')) {
+          activePhases.push("4");
+        }
+        if (d3.select('#fullscreen-popup .bp5').classed('toggled__p5')) {
+          activePhases.push("5");
         }
         
-        updateGlobalState({ ...currentState });
+        // Filter data locally for fullscreen
+        const phaseFilteredData = state.allData[1].filter(site => {
+          const phaseSplit = site.phase.split(" ");
+          for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
+            const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
+            if (!Number.isNaN(phaseParse) && activePhases.includes(phaseSplit[phaseInd])) {
+              return true;
+            }
+          }
+          return false;
+        });
         
-        const newPhaseData = filterPhaseData(currentState.allData);
-        const filteredData = filterMunicipalityData(newPhaseData);
+        // Filter by municipality
+        const filteredData = currentMunicipality === 'all' 
+          ? phaseFilteredData 
+          : phaseFilteredData.filter(site => site.muni === currentMunicipality);
+        
         refreshFullScreenVisualization(filteredData);
-        
-        // Update button visual state
-        d3.select(`#fullscreen-popup .${buttonClass}`).classed(`toggled__p${phaseNum}`, currentState.phases.includes(phaseNum));
       } catch (error) {
-        console.error(`Error in Phase ${index + 1} button:`, error);
+        console.error(`Error in Phase ${index + 3} button:`, error);
       }
     });
   });
@@ -227,9 +289,9 @@ function refreshFullScreenVisualization(data) {
   d3.select('#fullscreen-popup .slider-group').remove();
   
   // Recreate visualizations
-  populateMap(data, '#fullscreen-popup .parking-map', toggleSelectedForFullScreen);
+  populateMap(data, '#fullscreen-popup .parking-map', (d) => toggleSelected(d, true));
   createTable(data, '#fullscreen-popup .parking-table');
-  createSlider(data, '#fullscreen-popup .slider', true);
+  createSlider(data, '#fullscreen-popup', true);
 }
 
 /**

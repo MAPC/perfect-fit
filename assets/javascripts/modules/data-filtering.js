@@ -68,26 +68,24 @@ export function createMunicipalityFilter(selector = '#municipality-select', refr
     // Highlight the selected municipality on the map
     highlightMunicipality(this.value);
     
-    // If a specific municipality is selected, turn on all phases
-    if (this.value !== 'all') {
-      updateGlobalState({ 
-        ...state, 
-        phases: ["1", "2", "3", "4", "5"],
-        selectedMunicipality: this.value
-      });
-      
-      const newState = getGlobalState();
-      
-      // Update phase button visual states
-      d3.select('.bp1').classed('toggled__p1', true);
-      d3.select('.bp2').classed('toggled__p2', true);
-      d3.select('.bp3').classed('toggled__p3', true);
-      d3.select('.bp4').classed('toggled__p4', true);
-      d3.select('.bp5').classed('toggled__p5', true);
-      
-      // Re-filter phase data with all phases active
-      const newPhaseData = filterPhaseData(newState.allData);
-    }
+    // Always turn on all phases when municipality selection changes
+    updateGlobalState({ 
+      ...state, 
+      phases: ["1", "2", "3", "4", "5"],
+      selectedMunicipality: this.value
+    });
+    
+    const newState = getGlobalState();
+    
+    // Update phase button visual states (always show all phases as selected)
+    d3.select('.bp1').classed('toggled__p1', true);
+    d3.select('.bp2').classed('toggled__p2', true);
+    d3.select('.bp3').classed('toggled__p3', true);
+    d3.select('.bp4').classed('toggled__p4', true);
+    d3.select('.bp5').classed('toggled__p5', true);
+    
+    // Re-filter phase data with all phases active
+    const newPhaseData = filterPhaseData(newState.allData);
     
     const currentState = getGlobalState();
     const filteredData = filterMunicipalityData(currentState.phaseData);
