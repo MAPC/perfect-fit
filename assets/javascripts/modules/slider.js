@@ -4,16 +4,18 @@
 
 import { getGlobalState, updateGlobalState } from './core-utils.js';
 import { populateMap } from './map-visualization.js';
-import { createTable } from './table.js';
+import { createTable, toggleSelected } from './table.js';
 import { filterMunicipalityData } from './data-filtering.js';
 
 /**
  * Create slider with brush functionality
  */
-export function createSlider(sliderData, selector = '.slider', isFullScreen = false) {
+export function createSlider(sliderData, containerSelector = '.slider', isFullScreen = false) {
+  // Determine the actual slider selector based on container
+  const sliderSelector = containerSelector.includes('fullscreen') ? `${containerSelector} .slider` : containerSelector;
   // If no data, create empty slider without handles
   if (!sliderData || sliderData.length === 0) {
-    const sliderSvg = d3.select(selector);
+    const sliderSvg = d3.select(sliderSelector);
     const sliderMargin = { top: 20, right: 80, bottom: 60, left: 80 };
     const sliderWidth = +sliderSvg.style('width').slice(0,-2) - sliderMargin.left - sliderMargin.right;
     const sliderHeight = +sliderSvg.attr('height') - sliderMargin.top - sliderMargin.bottom;
@@ -51,7 +53,7 @@ export function createSlider(sliderData, selector = '.slider', isFullScreen = fa
     return;
   }
   
-  const sliderSvg = d3.select(selector);
+  const sliderSvg = d3.select(sliderSelector);
   const sliderMargin = { top: 20, right: 80, bottom: 60, left: 80 };
   const sliderWidth = +sliderSvg.style('width').slice(0,-2) - sliderMargin.left - sliderMargin.right;
   const sliderHeight = +sliderSvg.attr('height') - sliderMargin.top - sliderMargin.bottom;
@@ -109,7 +111,7 @@ export function createSlider(sliderData, selector = '.slider', isFullScreen = fa
 
   const brush = d3.brushX()
     .extent([[0, 0], [sliderWidth, sliderHeight]])
-    .on('start brush end', () => brushmoved(sliderX, circle, sliderHeight, sliderData, selector));
+    .on('start brush end', () => brushmoved(sliderX, circle, sliderHeight, sliderData, containerSelector, isFullScreen));
 
   const gBrush = g.append('g')
     .attr('class', 'brush')
@@ -139,10 +141,11 @@ export function createSlider(sliderData, selector = '.slider', isFullScreen = fa
 /**
  * Handle brush movement events
  */
-function brushmoved(x, circle, sliderHeight, sliderData, selector = '') {
+function brushmoved(x, circle, sliderHeight, sliderData, containerSelector = '', isFullScreen = false) {
   try {
     const s = d3.event.selection;
-    const handle = d3.selectAll(`${selector} .handle--custom`);
+    const sliderSelector = containerSelector.includes('fullscreen') ? `${containerSelector} .slider` : containerSelector;
+    const handle = d3.selectAll(`${sliderSelector} .handle--custom`);
     
     // Validate inputs
     if (!x || !circle || isNaN(sliderHeight) || !sliderData) {
@@ -202,20 +205,20 @@ function brushmoved(x, circle, sliderHeight, sliderData, selector = '') {
       const state = getGlobalState();
       const municipalityFilteredData = filterMunicipalityData(filteredSliderData);
       
-      // Update visualizations based on selector
-      if (selector.includes('fullscreen')) {
-        d3.selectAll(`${selector} .site`).remove();
-        d3.selectAll(`${selector} .parking-map__sites`).remove();
-        populateMap(municipalityFilteredData, `${selector} .parking-map`, toggleSelectedForFullScreen);
-        d3.selectAll(`${selector} thead`).remove();
-        d3.selectAll(`${selector} tbody`).remove();
-        d3.selectAll(`${selector} tr`).remove();
-        d3.selectAll(`${selector} td`).remove();
-        createTable(municipalityFilteredData, `${selector} .parking-table`);
+      // Update visualizations based on isFullScreen parameter
+      if (isFullScreen) {
+        d3.selectAll(`${containerSelector} .site`).remove();
+        d3.selectAll(`${containerSelector} .parking-map__sites`).remove();
+        populateMap(municipalityFilteredData, `${containerSelector} .parking-map`, (d) => toggleSelected(d, true));
+        d3.selectAll(`${containerSelector} thead`).remove();
+        d3.selectAll(`${containerSelector} tbody`).remove();
+        d3.selectAll(`${containerSelector} tr`).remove();
+        d3.selectAll(`${containerSelector} td`).remove();
+        createTable(municipalityFilteredData, `${containerSelector} .parking-table`);
       } else {
         d3.selectAll('.site').remove();
         d3.selectAll('.parking-map__sites').remove();
-        populateMap(municipalityFilteredData, '.parking-map', toggleSelected);
+        populateMap(municipalityFilteredData, '.parking-map', (d) => toggleSelected(d, false));
         d3.selectAll('thead').remove();
         d3.selectAll('tbody').remove();
         d3.selectAll('tr').remove();
@@ -228,18 +231,3 @@ function brushmoved(x, circle, sliderHeight, sliderData, selector = '') {
   }
 }
 
-/**
- * Toggle selected function for main map (placeholder)
- */
-function toggleSelected(d) {
-  // This should be imported from table module
-  console.log('Toggle selected:', d);
-}
-
-/**
- * Toggle selected function for full screen (placeholder)
- */
-function toggleSelectedForFullScreen(d) {
-  // This should be imported from table module
-  console.log('Toggle selected fullscreen:', d);
-}
