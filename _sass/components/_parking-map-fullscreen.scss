@@ -1,0 +1,543 @@
+// Full Screen Parking Map Styles
+.parking-map-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    background-color: #f8f9fa;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+
+    h2 {
+      margin: 0;
+      color: #333;
+      font-size: 1.5rem;
+    }
+
+    .close-button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 1rem;
+
+      &:hover {
+        background: #c82333;
+      }
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__controls {
+    background-color: #f8f9fa;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+
+    .toggle {
+      &__transit, &__jobs {
+        border: thin solid #007bff;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: #007bff;
+          color: white;
+        }
+      }
+    }
+
+    .municipality-select {
+      border: thin solid #6c757d;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      min-width: 12rem;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+    }
+  }
+
+  #municipality-filter {
+   left: -1.5rem !important;
+  }
+
+  &__phase-controls {
+    position: relative;
+    bottom: 8rem;
+    left: 3rem;
+    z-index: 100;
+    display: flex;
+    gap: 1rem;
+    width: 90%;
+    border-radius: 0.5rem;
+    
+
+    // Left section - Toggle buttons (transit, jobs) in a column
+    > div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    // Right section - Phase buttons in a row
+    > div:last-child {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      align-items: center;
+    }
+   
+ 
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      bottom: 0.5rem;
+      left: 0.5rem;
+
+      > div:first-child {
+        flex-direction: row;
+        gap: 0.25rem;
+      }
+
+      > div:last-child {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+    }
+
+    #phase-flex {
+      position: static !important;
+      display: flex !important;
+      flex-direction: row;
+      gap: 0.5rem;
+
+      @media (max-width: 768px) {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+    }
+
+    .phase-col {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+
+      @media (max-width: 768px) {
+        flex-direction: row;
+        gap: 0.25rem;
+      }
+    }
+
+    .toggle {
+      &__phase {
+        border: thin solid #6c757d;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        @media (max-width: 768px) {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.8rem;
+        }
+
+        &:hover {
+          background-color: #6c757d;
+          color: white;
+        }
+
+        &.toggled__p1, &.toggled__p2, &.toggled__p3, &.toggled__p4, &.toggled__p5 {
+          color: white;
+        }
+
+        &.toggled__p1, &.toggled__p2 {
+          background-color: #28a745;
+          border-color: #28a745;
+        }
+
+        &.toggled__p3 {
+          background-color: #17a2b8;
+          border-color: #17a2b8;
+        }
+
+        &.toggled__p4 {
+          background-color: #ffc107;
+          border-color: #ffc107;
+          color: #212529;
+        }
+
+        &.toggled__p5 {
+          background-color: #fd7e14;
+          border-color: #fd7e14;
+        }
+      }
+
+      &__transit {
+        border: thin solid #007bff;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        @media (max-width: 768px) {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.8rem;
+        }
+
+        &:hover {
+          background-color: #007bff;
+          color: white;
+        }
+      }
+
+      &__jobs {
+        border: thin solid #6f42c1;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        @media (max-width: 768px) {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.8rem;
+        }
+
+        &:hover {
+          background-color: #6f42c1;
+          color: white;
+        }
+      }
+    }
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  &__left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__right {
+    width: 40%;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-left: 1px solid #dee2e6;
+  }
+
+  &__slider {
+    background-color: white;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+
+    .slider {
+      width: 100%;
+      height: 200px;
+    }
+
+    .slider__x-axis-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  &__legend {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 120px;
+    z-index: 10;
+    position: relative;
+
+    img {
+      max-width: 100%;
+      height: auto;
+      max-height: 100px;
+    }
+  }
+
+  &__map {
+    flex: 1;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+
+    .parking-map {
+      width: 100%;
+      height: 80%;
+    }
+
+    .tooltip {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.9rem;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  }
+
+  &__table {
+    flex: 1;
+    max-height: 700px;
+    overflow: auto;
+    background-color: white;
+    margin-bottom: 2rem;
+
+    .parking-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+
+      &__header {
+        background-color: #f8f9fa;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+
+        &-row {
+          border-bottom: 2px solid #dee2e6;
+        }
+
+        &-cell {
+          padding: 0.75rem 0.5rem;
+          text-align: left;
+          font-weight: 600;
+          color: #495057;
+          cursor: pointer;
+          border-right: 1px solid #dee2e6;
+
+          &:hover {
+            background-color: #e9ecef;
+          }
+
+          &:last-child {
+            border-right: none;
+          }
+        }
+      }
+
+      &__data-row {
+        border-bottom: 1px solid #dee2e6;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        &--selected {
+          background-color: rgba(0, 123, 255, 0.1);
+        }
+      }
+
+      &__data-cell {
+        padding: 0.5rem;
+        border-right: 1px solid #dee2e6;
+        white-space: nowrap;
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+  }
+
+  &__legend {
+    padding: 1rem;
+    flex-shrink: 0;
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
+}
+
+// Site and Circle styles for full screen
+.parking-map-fullscreen {
+  .site {
+    fill-opacity: 0.2;
+    stroke: blue;
+    transition: fill-opacity 250ms linear;
+
+    &--selected {
+      fill: #007bff;
+      fill-opacity: 1;
+      stroke: #007bff;
+      transition: initial;
+    }
+
+    &.p1 {
+      fill: #28a745;
+      stroke: #28a745;
+    }
+
+    &.p2 {
+      fill: #28a745;
+      stroke: #28a745;
+    }
+
+    &.p3 {
+      fill: #17a2b8;
+      stroke: #17a2b8;
+    }
+
+    &.p4 {
+      fill: #ffc107;
+      stroke: #ffc107;
+    }
+
+    &.p5 {
+      fill: #fd7e14;
+      stroke: #fd7e14;
+    }
+  }
+
+  .circle {
+    fill-opacity: 0.8;
+    transition: fill-opacity 0.2s ease;
+    
+    &.p1 {
+      fill: #28a745;
+      stroke: #28a745;
+    }
+
+    &.p2 {
+      fill: #28a745;
+      stroke: #28a745;
+    }
+
+    &.p3 {
+      fill: #17a2b8;
+      stroke: #17a2b8;
+    }
+
+    &.p4 {
+      fill: #ffc107;
+      stroke: #ffc107;
+    }
+
+    &.p5 {
+      fill: #fd7e14;
+      stroke: #fd7e14;
+    }
+    
+    // Inactive dots (outside brush selection)
+    &.inactive {
+      fill: #cccccc !important;
+      stroke: #cccccc !important;
+      fill-opacity: 0.3 !important;
+    }
+    
+    // Override phase colors when inactive
+    &.inactive.p1,
+    &.inactive.p2,
+    &.inactive.p3,
+    &.inactive.p4,
+    &.inactive.p5 {
+      fill: #cccccc !important;
+      stroke: #cccccc !important;
+      fill-opacity: 0.3 !important;
+    }
+  }
+}
+
+// Responsive adjustments for full screen
+@media (max-width: 1200px) {
+  .parking-map-fullscreen {
+    &__right {
+      width: 45%;
+      min-width: 350px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .parking-map-fullscreen {
+    &__main {
+      flex-direction: column;
+    }
+
+    &__right {
+      width: 100%;
+      min-width: unset;
+      height: 50%;
+      border-left: none;
+      border-top: 1px solid #dee2e6;
+    }
+
+    &__controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+
+      .toggle, .municipality-select {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+}
