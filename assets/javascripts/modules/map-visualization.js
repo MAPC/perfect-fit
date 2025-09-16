@@ -10,8 +10,6 @@ import { projection } from './core-utils.js';
 export function createTownMap(data, selector = '.parking-map') {
   const parkingMap = d3.select(selector);
   const path = d3.geoPath().projection(projection);
-  let tooltip = d3.select('.parking-data').append('div')
-    .attr('class', 'tooltip');
   parkingMap.append('g')
     .attr('class', 'parking-map__municipalities')
     .selectAll('path')

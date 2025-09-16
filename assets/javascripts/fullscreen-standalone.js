@@ -44,8 +44,15 @@ async function initializeFullscreen() {
             muni: d.muni
         }));
 
-        // Get surveyed municipalities
-        const surveyedMunicipalities = [...new Set(processedSites.map(d => d.muni.toUpperCase()))];
+        // Get surveyed municipalities (use same list as normal mode)
+        const surveyedMunicipalities = [
+            'ARLINGTON', 'BELMONT', 'BOSTON', 'BROOKLINE', 'CAMBRIDGE', 'CHELSEA', 'EVERETT',
+            'MALDEN', 'MEDFORD', 'MELROSE', 'MILTON', 'NEWTON', 'QUINCY', 'SOMERVILLE', 'REVERE',
+            'WALTHAM', 'WATERTOWN', 'WINTHROP', 'BEVERLY', 'CONCORD', 'DANVERS', 'LEXINGTON',
+            'SALEM', 'SUDBURY', 'NEEDHAM', 'PEABODY', 'LINCOLN', 'WAYLAND', 'WESTON', 'LYNNFIELD',
+            'WAKEFIELD', 'SAUGUS', 'LYNN', 'STONEHAM', 'WOBURN', 'WELLESLEY', 'SWAMPSCOTT',
+            'MARBLEHEAD', 'NAHANT', 'WINCHESTER'
+        ];
 
         // Update fullscreen state
         fullscreenState.allData = [municipalities, processedSites, commuterRail, rapidTransit, jobs];
@@ -64,8 +71,8 @@ async function initializeFullscreen() {
  */
 function setupFullscreenVisualization() {
     // Clear any existing content
-    d3.select('.parking-map').selectAll('*').remove();
-    d3.select('.parking-table').selectAll('*').remove();
+    d3.select('.fullscreen-map .parking-map').selectAll('*').remove();
+    d3.select('.fullscreen-table .parking-table').selectAll('*').remove();
     d3.select('.slider').selectAll('*').remove();
     d3.select('.slider-group').remove();
     
@@ -89,15 +96,15 @@ function setupFullscreenVisualization() {
     const filteredMunicipalities = fullscreenState.allData[0].features.filter(municipality => 
         fullscreenState.surveyedMunicipalities.includes(municipality.properties.muni_name.toUpperCase())
     );
-    createTownMap(filteredMunicipalities, '.parking-map');
+    createTownMap(filteredMunicipalities, '.fullscreen-map .parking-map');
     
     // Create job map
     const topology = topojson.feature(fullscreenState.allData[4], fullscreenState.allData[4].objects['UMN_8cats_ICC_Simp_noLynn']);
-    createJobMap(topology.features, '.parking-map');
+    createJobMap(topology.features, '.fullscreen-map .parking-map');
     
     // Create train and rapid transit maps
-    createTrainMap(fullscreenState.allData[2], '.parking-map');
-    createRapidTransitMap(fullscreenState.allData[3], '.parking-map');
+    createTrainMap(fullscreenState.allData[2], '.fullscreen-map .parking-map');
+    createRapidTransitMap(fullscreenState.allData[3], '.fullscreen-map .parking-map');
     
     // Populate map with sites
     // Use a selector containing 'fullscreen' so map-visualization uses fullscreen site ID prefix
@@ -537,17 +544,30 @@ function refreshFullscreenVisualizationWithCurrentState() {
         ? phaseFilteredData 
         : phaseFilteredData.filter(site => site.muni === fullscreenState.selectedMunicipality);
     
-    // Clear existing content
+    // Clear existing content - be more specific to fullscreen map
     d3.select('.slider').selectAll('*').remove();
     d3.select('.slider-group').remove();
-    d3.selectAll('.site').remove();
-    d3.selectAll('.parking-map__sites').remove();
+    d3.select('.fullscreen-map .parking-map').selectAll('*').remove();
     d3.selectAll('thead').remove();
     d3.selectAll('tbody').remove();
     d3.selectAll('tr').remove();
     d3.selectAll('td').remove();
     
-    // Update map
+    // Recreate municipality map (same as normal mode)
+    const filteredMunicipalities = fullscreenState.allData[0].features.filter(municipality => 
+        fullscreenState.surveyedMunicipalities.includes(municipality.properties.muni_name.toUpperCase())
+    );
+    createTownMap(filteredMunicipalities, '.fullscreen-map .parking-map');
+    
+    // Recreate job map
+    const topology = topojson.feature(fullscreenState.allData[4], fullscreenState.allData[4].objects['UMN_8cats_ICC_Simp_noLynn']);
+    createJobMap(topology.features, '.fullscreen-map .parking-map');
+    
+    // Recreate train and rapid transit maps
+    createTrainMap(fullscreenState.allData[2], '.fullscreen-map .parking-map');
+    createRapidTransitMap(fullscreenState.allData[3], '.fullscreen-map .parking-map');
+    
+    // Update map with sites
     populateMap(filteredData, '.fullscreen-map .parking-map', (d) => toggleSelected(d, true));
     
     // Update table
@@ -569,9 +589,10 @@ function refreshFullscreenVisualizationWithCurrentState() {
  * Refresh fullscreen visualization with new data
  */
 function refreshFullscreenVisualization(data) {
-    // Clear existing slider content to prevent shadow buildup
+    // Clear existing content to prevent shadow buildup
     d3.select('.slider').selectAll('*').remove();
     d3.select('.slider-group').remove();
+    d3.select('.fullscreen-map .parking-map').selectAll('*').remove();
     
     // Update map
     populateMap(data, '.fullscreen-map .parking-map', (d) => toggleSelected(d, true));
