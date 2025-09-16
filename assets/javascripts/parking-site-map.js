@@ -178,8 +178,9 @@ function initializeApp() {
     d3.csv('./assets/data/perfect-fit-parking-data.csv'),
     d3.json('./assets/data/mbta-commuter-rail-lines.json'),
     d3.json('./assets/data/mbta-rapid-transit.json'),
-    d3.json('./assets/data/job-categories-topo.json'),
+    d3.json('./assets/data/job-categories-topo.json')
   ]).then((data) => {
+    console.log(data);
     const surveyedMunicipalities = [
       'ARLINGTON', 'BELMONT', 'BOSTON', 'BROOKLINE', 'CAMBRIDGE', 'CHELSEA', 'EVERETT',
       'MALDEN', 'MEDFORD', 'MELROSE', 'MILTON', 'NEWTON', 'QUINCY', 'SOMERVILLE', 'REVERE',
@@ -209,8 +210,9 @@ function initializeApp() {
     const filteredMunicipalities = data[0].features.filter(municipality => 
       surveyedMunicipalities.includes(municipality.properties.muni_name.toUpperCase())
     );
-    const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']);
     
+    const topology = topojson.feature(data[4], data[4].objects['UMN_8cats_ICC_Simp_noLynn']); 
+    console.log(topology);
     // Populate municipality dropdown and create filter
     populateMunicipalityDropdown(initialPhaseData, '#municipality-select');
     createMunicipalityFilter('#municipality-select', refreshMainPageVisualization);
