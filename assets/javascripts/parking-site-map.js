@@ -180,7 +180,6 @@ function initializeApp() {
     d3.json('./assets/data/mbta-rapid-transit.json'),
     d3.json('./assets/data/job-categories-topo.json')
   ]).then((data) => {
-    console.log(data);
     const surveyedMunicipalities = [
       'ARLINGTON', 'BELMONT', 'BOSTON', 'BROOKLINE', 'CAMBRIDGE', 'CHELSEA', 'EVERETT',
       'MALDEN', 'MEDFORD', 'MELROSE', 'MILTON', 'NEWTON', 'QUINCY', 'SOMERVILLE', 'REVERE',
