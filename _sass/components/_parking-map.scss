@@ -223,6 +223,53 @@
   margin-left: 0.25rem;
 }
 
+// Responsive phase button layout for medium and large screens
+@include media('large') {
+  .parking-data {
+    #phase-flex {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.25rem;
+      position: static;
+    }
+
+    #phase-flex .phase-col {
+      display: contents;
+      margin: 0;
+    }
+
+    .toggle__phase {
+      width: 100%;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      justify-content: center;
+    }
+  }
+}
+
+@include media('medium') {
+  .parking-data {
+    #phase-flex {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.25rem;
+      position: static;
+    }
+
+    #phase-flex .phase-col {
+      display: contents;
+      margin: 0;
+    }
+
+    .toggle__phase {
+      width: 100%;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.7rem;
+      justify-content: center;
+    }
+  }
+}
+
 .toggled{
   background-color: $phase-btn-color-toggled;
 

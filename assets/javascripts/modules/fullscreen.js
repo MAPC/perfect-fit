@@ -299,34 +299,10 @@ function refreshFullScreenVisualization(data) {
  */
 export function createFullScreenToggle() {
   const fullScreenButton = d3.select('.explore-the-data__button');
-  const fullScreenPopup = d3.select('#fullscreen-popup');
-  const closeButton = d3.select('#close-fullscreen');
   
   fullScreenButton.on('click', () => {
-    fullScreenPopup.style('display', 'flex');
-    document.body.style.overflow = 'hidden';
-    
-    // Initialize full screen visualization
-    initializeFullScreenVisualization();
-  });
-  
-  closeButton.on('click', () => {
-    fullScreenPopup.style('display', 'none');
-    document.body.style.overflow = 'auto';
-    
-    // Reset main page visualization to current state
-    refreshMainPageVisualization();
-  });
-  
-  // Close on escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && fullScreenPopup.style('display') === 'flex') {
-      fullScreenPopup.style('display', 'none');
-      document.body.style.overflow = 'auto';
-      
-      // Reset main page visualization to current state
-      refreshMainPageVisualization();
-    }
+    // Open fullscreen.html in a new tab
+    window.open('./fullscreen.html', '_blank', 'width=1920,height=1080,scrollbars=yes,resizable=yes');
   });
 }
 

@@ -77,19 +77,20 @@ layout: default
       </div>
     </div>
     <div class="toggle">
-      <button type="button" class="toggle__transit" data-toggle="button">
-        Show Public Transit
-      </button>
-      <button type="button" class="toggle__jobs" data-toggle="button">
-        Show Jobs Heatmap
-      </button>
+      <div>
+        <button type="button" class="toggle__transit" data-toggle="button">
+          Show Public Transit
+        </button>
+        <button type="button" class="toggle__jobs" data-toggle="button">
+          Show Jobs Heatmap
+        </button>
+      </div>
+     
       <div id="phase-flex">
         <div class="phase-col">
           <button type="button" class="toggle__phase bp1 toggled__p1" data-toggle="button">
             Phase 1 & 2
           </button>
-        </div>
-        <div class="phase-col">
           <button type="button" class="toggle__phase bp3 toggled__p3" data-toggle="button">
             Phase 3
           </button>
@@ -153,69 +154,5 @@ layout: default
     </div>
   </div>
 </section>
-<!-- Full Screen Popup -->
-<div id="fullscreen-popup" class="parking-map-fullscreen" style="display: none;">
-  <div class="parking-map-fullscreen__header">
-    <h2>Perfect Fit Parking - Full Screen View</h2>
-    <button class="close-button" id="close-fullscreen">Close</button>
-  </div>
-  
-  <div class="parking-map-fullscreen__content">
-    <div class="parking-map-fullscreen__main">
-      <div class="parking-map-fullscreen__left">
-        <div class="parking-map-fullscreen__legend">
-          <img class="parking-data__legend parking-data__legend--hidden" src="./assets/images/heatmap-legend.svg" alt="Heatmap chart color legend">
-        </div>
-        <div class="parking-map-fullscreen__map">
-          <svg class="parking-map" viewBox="0 0 900 700"></svg>
-        </div>
-        <div class="parking-map-fullscreen__phase-controls">
-          <div>
-            <button type="button" class="toggle__transit" data-toggle="button">
-              Show Public Transit
-            </button>
-            <button type="button" class="toggle__jobs" data-toggle="button">
-              Show Jobs Heatmap
-            </button>
-          </div>
-          <div id="phase-flex">
-            <div class="phase-col">
-              <button type="button" class="toggle__phase bp1 toggled__p1" data-toggle="button">
-                Phase 1 & 2
-              </button>
-              <button type="button" class="toggle__phase bp3 toggled__p3" data-toggle="button">
-                Phase 3
-              </button>
-              <button type="button" class="toggle__phase bp4 toggled__p4" data-toggle="button">
-                Phase 4
-              </button>
-              <button type="button" class="toggle__phase bp5 toggled__p5" data-toggle="button">
-                Phase 5
-              </button>
-            </div>
-            <div id="municipality-filter" class="phase-col">
-              <select id="municipality-select-fullscreen" class="municipality-select">
-                <option value="all">All Municipalities</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="parking-map-fullscreen__right">
-        <div class="parking-map-fullscreen__slider">
-          <svg class="slider" width="100%" height="200"></svg>
-        </div>
-        
-        <div class="parking-map-fullscreen__table">
-          <table class="parking-table">
-          </table>
-        </div>
-      </div>
-    </div>
-    
-  
-  </div>
-</div>
 
 {% include footer.html %}
