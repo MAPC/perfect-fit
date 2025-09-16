@@ -156,10 +156,10 @@ function brushmoved(x, circle, sliderHeight, sliderData, containerSelector = '',
     if (s == null) {
       handle.attr('display', 'none');
       circle.classed('active', false);
-      // Reset all dots to normal state when brush is cleared
-      circle.style('fill', null)
-            .style('stroke', null)
-            .style('fill-opacity', '0.8');
+      // Reset all dots to grey when brush is cleared
+      circle.style('fill', '#cccccc')
+            .style('stroke', '#cccccc')
+            .style('fill-opacity', '0.3');
     } else {
       const sx = s.map(x.invert);
       
