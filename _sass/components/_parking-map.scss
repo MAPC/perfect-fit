@@ -31,24 +31,24 @@
     transition: initial;
   }
   &.p1{
-    fill: #28a745;
-    stroke: #28a745;
+    fill: blue;
+    stroke: blue;
   }
   &.p2{
-    fill: #28a745;
-    stroke: #28a745;
+    fill: blue;
+    stroke: blue;
   }
   &.p3{
-    fill: #17a2b8;
-    stroke: #17a2b8;
+    fill: #7826CF;
+    stroke: #7826CF;
   }
   &.p4{
-    fill: #8610D1;
-    stroke: #8610D1;
+    fill: #F5532E;
+    stroke: #F5532E;
   }
   &.p5{
-    fill: #fd7e14;
-    stroke: #fd7e14;
+    fill: #0F9515;
+    stroke: #0F9515;
   }
 }
 
@@ -57,24 +57,24 @@
   transition: fill-opacity 0.2s ease;
   
   &.p1{
-    fill: #28a745;
-    stroke: #28a745;
+    fill: blue;
+    stroke: blue;
   }
   &.p2{
-    fill: #28a745;
-    stroke: #28a745;
+    fill: blue;
+    stroke: blue;
   }
   &.p3{
-    fill: #17a2b8;
-    stroke: #17a2b8;
+    fill: #7826CF;
+    stroke: #7826CF;
   }
   &.p4{
-    fill: #8610D1;
-    stroke: #8610D1;
+    fill: #F5532E;
+    stroke: #F5532E;
   }
   &.p5{
-    fill: #fd7e14;
-    stroke: #fd7e14;
+    fill: #0F9515;
+    stroke: #0F9515;
   }
 }
 
@@ -298,32 +298,32 @@
   background-color: $phase-btn-color-toggled;
 
   &__p1{
-    background-color: #28a745;
-    border-color: #28a745;
+    background-color: blue;
+    border-color: blue;
     color: white;
     width: 7rem;
   }
   &__p2{
-    background-color: #28a745;
-    border-color: #28a745;
+    background-color: blue;
+    border-color: blue;
     color: white;
     width: 7rem;
   }
   &__p3{
-    background-color: #17a2b8;
-    border-color: #17a2b8;
+    background-color: #7826CF;
+    border-color: #7826CF;
     color: white;
     width: 7rem;
   }
   &__p4{
-    background-color: #8610D1 !important;
-    border-color: #8610D1 !important;
+    background-color: #F5532E !important;
+    border-color: #F5532E !important;
     color: white !important;
     width: 7rem;
   }
   &__p5{
-    background-color: #fd7e14;
-    border-color: #fd7e14;
+    background-color: #0F9515;
+    border-color: #0F9515;
     color: white;
     width: 7rem;
   }
