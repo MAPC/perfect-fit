@@ -13,11 +13,13 @@ body {
   @include media(large) {
     grid-template-columns: 30rem 30rem;
     width: 65rem;
+    margin: 5rem auto;
   }
 
   @include media(medium) {
     grid-template-columns: 30rem;
     width: 30rem;
+    margin: 5rem auto;
   }
 
   @include media(small) {
@@ -32,8 +34,10 @@ body {
   display: grid;
   grid-column-gap: 2rem;
   grid-template-columns: 43.75rem 43.75rem;
-  margin: 5rem auto 5rem;
+  margin: 5rem auto;
   width: 93rem;
+  max-width: 95%;
+  justify-content: center;
 }
 
 .aspect-ratio-box {
