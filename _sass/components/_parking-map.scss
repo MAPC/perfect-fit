@@ -80,11 +80,25 @@
 
 .toggle {
   position: relative;
+  
+  @include media('small') {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    z-index: 1;
+  }
+  
   &__transit {
     @include media('small') {
-      margin-top: 1rem;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
       position: relative;
       top: initial;
+      right: initial;
+      width: 100%;
     }
     border: thin solid #007bff;
     border-radius: 0.5rem;
@@ -108,9 +122,11 @@
 
   &__jobs {
     @include media('small') {
-      margin-top: 1rem;
+      margin-top: 0;
       position: relative;
       top: initial;
+      right: initial;
+      width: 100%;
     }
     border: thin solid #6f42c1;
     border-radius: 0.5rem;
@@ -131,11 +147,14 @@
       color: white;
     }
   }
+  
   &__phase{
     @include media('small') {
-      margin-top: 1rem;
+      margin-top: 0;
       position: relative;
       top: initial;
+      left: initial;
+      width: 100%;
     }
     border: thin solid #6c757d;
     border-radius: 0.5rem;
@@ -170,8 +189,8 @@
     border-radius: 50rem;
     padding: 0.8rem 1.2rem;
     position: absolute;
-    top: 0;
-    right: 10px;
+    top: 0.5rem;
+    right: 12rem;
     width: auto;
     cursor: pointer;
     background-color: #691ed9;
@@ -179,6 +198,7 @@
     font-size: 0.9rem;
     transition: all 0.2s;
     white-space: nowrap;
+    padding: 0.5rem 1rem;
 
   }
 }
@@ -199,6 +219,10 @@
     top: initial;
     left: initial;
     margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: center;
   }
 }
 
@@ -227,8 +251,8 @@
 @include media('large') {
   .parking-data {
     #phase-flex {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      /* display: grid;
+      grid-template-columns: repeat(2, 1fr); */
       gap: 0.25rem;
       position: static;
     }
@@ -250,8 +274,8 @@
 @include media('medium') {
   .parking-data {
     #phase-flex {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+     /*  display: grid; */
+     /*  grid-template-columns: repeat(2, 1fr); */
       gap: 0.25rem;
       position: static;
     }

@@ -162,16 +162,7 @@ function setupFullscreenControls() {
         const selectedMunicipality = d3.select(this).property('value');
         fullscreenState.selectedMunicipality = selectedMunicipality;
         
-        // Always select all phases when municipality changes
-        fullscreenState.phases = ["1", "2", "3", "4", "5"];
-        
-        // Update phase button visual states
-        d3.select('.bp1').classed('toggled__p1', true);
-        d3.select('.bp3').classed('toggled__p3', true);
-        d3.select('.bp4').classed('toggled__p4', true);
-        d3.select('.bp5').classed('toggled__p5', true);
-        
-        // Filter data
+        // Filter data based on current phase selection (don't reset phases)
         const phaseFilteredData = fullscreenState.allData[1].filter(site => {
             const phaseSplit = site.phase.split(" ");
             for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
@@ -183,11 +174,22 @@ function setupFullscreenControls() {
             return false;
         });
         
-        const filteredData = selectedMunicipality === 'all' 
-            ? phaseFilteredData 
-            : phaseFilteredData.filter(site => site.muni === selectedMunicipality);
+        // Update local state
+        fullscreenState.selectedMunicipality = selectedMunicipality;
         
-        refreshFullscreenVisualization(filteredData);
+        // If a specific municipality is selected, turn on all phases by default
+        if (selectedMunicipality !== 'all') {
+            fullscreenState.phases = ["1", "2", "3", "4", "5"];
+            
+            // Update phase button visual states
+            d3.select('.bp1').classed('toggled__p1', true);
+            d3.select('.bp3').classed('toggled__p3', true);
+            d3.select('.bp4').classed('toggled__p4', true);
+            d3.select('.bp5').classed('toggled__p5', true);
+        }
+        
+        // Filter and refresh visualization
+        refreshFullscreenVisualizationWithCurrentState();
         
         // Highlight municipality on map
         if (selectedMunicipality !== 'all') {
@@ -206,136 +208,82 @@ function setupFullscreenPhaseButtons() {
     // Phase 1 & 2 button
     d3.select('.bp1').on('click', function() {
         const isActive = d3.select(this).classed('toggled__p1');
-        const phases = isActive ? ["3", "4", "5"] : ["1", "2", "3", "4", "5"];
+        
+        // Update local state - toggle phases 1 and 2 together
+        if (isActive) {
+            // Remove phases 1 and 2
+            fullscreenState.phases = fullscreenState.phases.filter(p => p !== "1" && p !== "2");
+        } else {
+            // Add phases 1 and 2
+            if (!fullscreenState.phases.includes("1")) fullscreenState.phases.push("1");
+            if (!fullscreenState.phases.includes("2")) fullscreenState.phases.push("2");
+        }
         
         // Update button visual state
         d3.select(this).classed('toggled__p1', !isActive);
         
-        // Update local state
-        fullscreenState.phases = phases;
-        
-        // Filter data
-        const phaseFilteredData = fullscreenState.allData[1].filter(site => {
-            const phaseSplit = site.phase.split(" ");
-            for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
-                const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
-                if (!Number.isNaN(phaseParse) && phases.includes(phaseSplit[phaseInd])) {
-                    return true;
-                }
-            }
-            return false;
-        });
-        
-        const filteredData = fullscreenState.selectedMunicipality === 'all' 
-            ? phaseFilteredData 
-            : phaseFilteredData.filter(site => site.muni === fullscreenState.selectedMunicipality);
-        
-        refreshFullscreenVisualization(filteredData);
+        // Filter and refresh visualization
+        refreshFullscreenVisualizationWithCurrentState();
     });
 
     // Phase 3 button
     d3.select('.bp3').on('click', function() {
         const isActive = d3.select(this).classed('toggled__p3');
-        const currentPhases = [...fullscreenState.phases];
         
+        // Update local state
         if (isActive) {
             // Remove phase 3
-            fullscreenState.phases = currentPhases.filter(p => p !== "3");
+            fullscreenState.phases = fullscreenState.phases.filter(p => p !== "3");
         } else {
             // Add phase 3
-            fullscreenState.phases = [...currentPhases, "3"];
+            if (!fullscreenState.phases.includes("3")) fullscreenState.phases.push("3");
         }
         
         // Update button visual state
         d3.select(this).classed('toggled__p3', !isActive);
         
-        // Filter data
-        const phaseFilteredData = fullscreenState.allData[1].filter(site => {
-            const phaseSplit = site.phase.split(" ");
-            for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
-                const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
-                if (!Number.isNaN(phaseParse) && fullscreenState.phases.includes(phaseSplit[phaseInd])) {
-                    return true;
-                }
-            }
-            return false;
-        });
-        
-        const filteredData = fullscreenState.selectedMunicipality === 'all' 
-            ? phaseFilteredData 
-            : phaseFilteredData.filter(site => site.muni === fullscreenState.selectedMunicipality);
-        
-        refreshFullscreenVisualization(filteredData);
+        // Filter and refresh visualization
+        refreshFullscreenVisualizationWithCurrentState();
     });
 
     // Phase 4 button
     d3.select('.bp4').on('click', function() {
         const isActive = d3.select(this).classed('toggled__p4');
-        const currentPhases = [...fullscreenState.phases];
         
+        // Update local state
         if (isActive) {
             // Remove phase 4
-            fullscreenState.phases = currentPhases.filter(p => p !== "4");
+            fullscreenState.phases = fullscreenState.phases.filter(p => p !== "4");
         } else {
             // Add phase 4
-            fullscreenState.phases = [...currentPhases, "4"];
+            if (!fullscreenState.phases.includes("4")) fullscreenState.phases.push("4");
         }
         
         // Update button visual state
         d3.select(this).classed('toggled__p4', !isActive);
         
-        // Filter data
-        const phaseFilteredData = fullscreenState.allData[1].filter(site => {
-            const phaseSplit = site.phase.split(" ");
-            for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
-                const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
-                if (!Number.isNaN(phaseParse) && fullscreenState.phases.includes(phaseSplit[phaseInd])) {
-                    return true;
-                }
-            }
-            return false;
-        });
-        
-        const filteredData = fullscreenState.selectedMunicipality === 'all' 
-            ? phaseFilteredData 
-            : phaseFilteredData.filter(site => site.muni === fullscreenState.selectedMunicipality);
-        
-        refreshFullscreenVisualization(filteredData);
+        // Filter and refresh visualization
+        refreshFullscreenVisualizationWithCurrentState();
     });
 
     // Phase 5 button
     d3.select('.bp5').on('click', function() {
         const isActive = d3.select(this).classed('toggled__p5');
-        const currentPhases = [...fullscreenState.phases];
         
+        // Update local state
         if (isActive) {
             // Remove phase 5
-            fullscreenState.phases = currentPhases.filter(p => p !== "5");
+            fullscreenState.phases = fullscreenState.phases.filter(p => p !== "5");
         } else {
             // Add phase 5
-            fullscreenState.phases = [...currentPhases, "5"];
+            if (!fullscreenState.phases.includes("5")) fullscreenState.phases.push("5");
         }
         
         // Update button visual state
         d3.select(this).classed('toggled__p5', !isActive);
         
-        // Filter data
-        const phaseFilteredData = fullscreenState.allData[1].filter(site => {
-            const phaseSplit = site.phase.split(" ");
-            for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
-                const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
-                if (!Number.isNaN(phaseParse) && fullscreenState.phases.includes(phaseSplit[phaseInd])) {
-                    return true;
-                }
-            }
-            return false;
-        });
-        
-        const filteredData = fullscreenState.selectedMunicipality === 'all' 
-            ? phaseFilteredData 
-            : phaseFilteredData.filter(site => site.muni === fullscreenState.selectedMunicipality);
-        
-        refreshFullscreenVisualization(filteredData);
+        // Filter and refresh visualization
+        refreshFullscreenVisualizationWithCurrentState();
     });
 }
 
@@ -566,6 +514,54 @@ function fullscreenBrushMoved(x, circle, sliderHeight, sliderData) {
         }
     } catch (error) {
         console.error('Error in fullscreenBrushMoved:', error);
+    }
+}
+
+/**
+ * Refresh fullscreen visualization with current state (following normal mode pattern)
+ */
+function refreshFullscreenVisualizationWithCurrentState() {
+    // Filter data based on current state
+    const phaseFilteredData = fullscreenState.phases.length === 0 ? [] : fullscreenState.allData[1].filter(site => {
+        const phaseSplit = site.phase.split(" ");
+        for (let phaseInd = 0; phaseInd < phaseSplit.length; phaseInd++) {
+            const phaseParse = Number.parseInt(phaseSplit[phaseInd]);
+            if (!Number.isNaN(phaseParse) && fullscreenState.phases.includes(phaseSplit[phaseInd])) {
+                return true;
+            }
+        }
+        return false;
+    });
+    
+    const filteredData = fullscreenState.selectedMunicipality === 'all' 
+        ? phaseFilteredData 
+        : phaseFilteredData.filter(site => site.muni === fullscreenState.selectedMunicipality);
+    
+    // Clear existing content
+    d3.select('.slider').selectAll('*').remove();
+    d3.select('.slider-group').remove();
+    d3.selectAll('.site').remove();
+    d3.selectAll('.parking-map__sites').remove();
+    d3.selectAll('thead').remove();
+    d3.selectAll('tbody').remove();
+    d3.selectAll('tr').remove();
+    d3.selectAll('td').remove();
+    
+    // Update map
+    populateMap(filteredData, '.fullscreen-map .parking-map', (d) => toggleSelected(d, true));
+    
+    // Update table
+    createTable(filteredData, '.fullscreen-table .parking-table');
+    
+    // Update slider
+    createFullscreenSlider(filteredData);
+    
+    // Update municipality highlighting
+    if (fullscreenState.selectedMunicipality !== 'all') {
+        highlightMunicipality(fullscreenState.selectedMunicipality, '.fullscreen-map .parking-map');
+    } else {
+        // Remove highlighting
+        d3.select('.fullscreen-map .parking-map').selectAll('.municipality').classed('highlighted', false);
     }
 }
 
